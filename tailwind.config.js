@@ -9,7 +9,7 @@ module.exports = {
         greylish: "#707070"
       },
       boxShadow: {
-        custom: "0px 5px 7px 0px #dad8d8"
+        custom: "0px 2px 7px 0px #dad8d8"
       }
     },
   },
