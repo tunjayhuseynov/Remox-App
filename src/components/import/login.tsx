@@ -3,38 +3,47 @@ import { Data } from '../../App';
 import { useHistory } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners';
 import Header from '../../layouts/home/header';
-import SDK from '../../utility/sdk';
-import { LocalStorageData } from '../../types/context';
+import { useSignInMutation } from '../../redux/api/account';
+import { IStorage, setStorage } from '../../redux/reducers/storage';
+import { useDispatch } from 'react-redux';
 
 
 const Login = ({ phrase }: { phrase: string }) => {
+    const [signin, { data, error }] = useSignInMutation()
+
+    const dispatch = useDispatch()
+
     const ctx = useContext(Data)
     const [input, setInput] = useState<string>()
     const router = useHistory()
     const [incorrrect, setIncorrect] = useState(false)
     const [loader, setLoader] = useState(false)
-    const sdk = useRef(new SDK())
 
-    const Submitted = () => {
+    const Submitted = async () => {
         if (input && phrase && ctx) {
             setLoader(true)
             setIncorrect(false)
-            sdk.current.signIn({ phrase: phrase.trim(), password: input.trim() }).then((data) => {
+
+            await signin({ phrase: phrase.trim(), password: input.trim() })
+
+            if (data) {
                 setLoader(false)
 
-                const obj: LocalStorageData = {
+                const obj: IStorage = {
                     accountAddress: data.accountAddress,
                     encryptedPhrase: data.encryptedPhrase,
                     token: data.token,
                 };
 
-                localStorage.setItem("user", JSON.stringify(obj));
+                dispatch(setStorage(JSON.stringify(obj)))
 
                 ctx.setData!(obj)
                 ctx.setUnlock!(true)
                 router.push('/dashboard')
+            } else if (error) {
+                console.error(error); setLoader(false); setIncorrect(true);
+            }
 
-            }).catch(w => { console.error(w); setLoader(false); setIncorrect(true); })
         }
     }
 

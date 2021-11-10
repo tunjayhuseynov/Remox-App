@@ -1,6 +1,6 @@
 import { AxiosInstance } from "axios";
 import { AddMember, AddMemberResponse } from "../../types/sdk/TeamMember/addMember";
-import { GetMember } from "../../types/sdk/TeamMember/getMember";
+import { GetMember, GetMemberResponse } from "../../types/sdk/TeamMember/getMember";
 import { UpdateMember, UpdateMemberResponse } from "../../types/sdk/TeamMember/updatemember";
 
 
@@ -15,25 +15,25 @@ class TeamMember {
             const req = await this.instance.post<AddMemberResponse>("/team-member/add", member)
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 
-    async GetMembers(id: number, query: GetMember) {
+    async GetMembers(id: string, query?: GetMember) {
         try {
-            const req = await this.instance.get<AddMemberResponse[]>(`/team-member/byTeam/${id}`, { params: query })
+            const req = await this.instance.get<GetMemberResponse>(`/team-member/byTeam/${id}`, { params: query })
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 
-    async DeleteMember(id: number) {
+    async DeleteMember(id: string) {
         try {
             const req = await this.instance.delete(`/team-member/${id}`)
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 
@@ -42,7 +42,7 @@ class TeamMember {
             const req = await this.instance.put<UpdateMemberResponse>(`/team-member`, data)
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 }

@@ -1,11 +1,9 @@
 import React from 'react'
-import {LocalStorageData} from './localstorage/data'
+import { IStorage } from '../redux/reducers/storage'
 
 export interface CustomContext{
-    data : LocalStorageData | undefined, 
-    setData : React.Dispatch<LocalStorageData> | undefined, 
+    data : IStorage | undefined, 
+    setData : React.Dispatch<IStorage> | undefined, 
     setUnlock : React.Dispatch<boolean> | undefined, 
     unlock : boolean 
 }
-
-export * from './localstorage/data'

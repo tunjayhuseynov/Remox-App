@@ -13,7 +13,7 @@ class Customer {
             const req = await this.instance.post<CustomerCreateResponse>('/customer/create', data)
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 
@@ -22,7 +22,7 @@ class Customer {
             const req = await this.instance.get<CustomerCreateResponse[]>('/customer/byAccount', { params: data })
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 
@@ -31,7 +31,7 @@ class Customer {
             const req = await this.instance.delete(`/customer/${id}`)
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 }

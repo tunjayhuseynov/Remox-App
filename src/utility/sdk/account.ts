@@ -60,16 +60,16 @@ class Account {
                 throw new Error('Invalid Data in Localstorage')
             }
         } catch (error) {
-            console.error(error)
+            throw error
         }  
     }
 
     async PutAccountInfo(data: AccountInfo) {
         try {
-            const req = await this.instance.put<AccountInfo>("/account/account", data)
+            const req = await this.instance.put<AccountInfo>("/account", data)
             return req.data;
         } catch (error) {
-            console.error(error)
+            throw error
         }
     }
 

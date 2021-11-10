@@ -2,7 +2,6 @@ import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 import Header from '../layouts/home/header'
 import Set from '../components/create/set'
 import KeyPhrase from '../components/create/phrase'
-import { LocalStorageData } from '../types/context'
 import { PassDataFromSetToPhrase } from '../types/create'
 
 const Create = () => {

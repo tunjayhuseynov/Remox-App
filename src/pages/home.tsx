@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom";
-import {useEffect, useState} from "react"
-import { LocalStorageData } from "../types/context";
+import { useEffect, useState } from "react"
+import { useSelector } from "react-redux";
+import { selectStorage } from "../redux/reducers/storage";
+
 
 const Home = () => {
-    const [store, setStore] = useState<LocalStorageData>()
-    useEffect(()=>{
-        const value = localStorage.getItem("user")
-        if(value){
-            setStore(JSON.parse(value))
-        }
-    },[])
+    const storage = useSelector(selectStorage)
+
+
     return <>
         <section className="flex justify-center items-center w-full h-screen">
             <div className="w-[800px] h-[600px] bg-[#eeeeee] bg-opacity-40 flex flex-col justify-center items-center gap-14">
@@ -18,7 +16,7 @@ const Home = () => {
                     <span className="font-light text-greylish">All-in-One Tool For Crypto Treasury Management</span>
                 </div>
                 <div className="flex flex-col gap-5">
-                    <Link to={store? {pathname: '/dashboard'} : {pathname: '/import'}} className="text-center">
+                    <Link to={storage ? { pathname: '/dashboard' } : { pathname: '/import' }} className="text-center">
                         <button className="border-2 bg-white text-primary border-primary shadow-xl px-8 py-3 rounded-xl">Enter App</button>
                     </Link>
                     <Link to="/create" className="text-center">

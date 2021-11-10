@@ -3,6 +3,6 @@ export interface CreateTeam {
 }
 
 export interface CreateTeamResponse {
-    id: number;
+    id: string;
     title: string;
 }

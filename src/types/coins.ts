@@ -1,7 +1,8 @@
 export enum CoinsURL {
     CELO = "/icons/celoiconsquare.svg",
-    cUSD = "",
-    cEUR = ""
+    cUSD = "/icons/celodollar.svg",
+    cEUR = "",
+    None = "",
 }
 
 export enum CoinsName {
@@ -14,4 +15,10 @@ export enum CoinsNameVisual {
     CELO = "Celo",
     cUSD = "cUsd",
     cEUR = "cEur"
+}
+
+export const Coins = {
+    celo: { name: "Celo", coinUrl: CoinsURL.CELO, value: CoinsName.CELO },
+    cUsd: { name: "cUSD", coinUrl: CoinsURL.cUSD, value: CoinsName.cUSD},
+    cEur: { name: "cEUR", coinUrl: CoinsURL.cEUR, value: CoinsName.cEUR }
 }

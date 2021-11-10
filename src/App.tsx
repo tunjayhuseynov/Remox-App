@@ -13,9 +13,12 @@ import Create from './pages/create';
 import { createContext, ReactNode, useEffect, useState } from 'react'
 import Unlock from './pages/unlock';
 import Import from './pages/import/index';
-import { CustomContext, LocalStorageData } from './types/context'
+import { CustomContext } from './types/context'
 import Teams from './pages/teams/index'
 import Main from './pages/dashboard/main'
+import { useSelector } from 'react-redux';
+import { selectStorage } from './redux/reducers/storage';
+
 
 export const Data = createContext<CustomContext>({
   unlock: false,
@@ -25,15 +28,10 @@ export const Data = createContext<CustomContext>({
 })
 
 function App(): JSX.Element {
-  const [data, setData] = useState<LocalStorageData>()
-  const [unlock, setUnlock] = useState<boolean>(false)
+  const storage = useSelector(selectStorage)
 
-  useEffect(() => {
-    const val = localStorage.getItem("user")
-    if (val) {
-      setData(JSON.parse(val))
-    } else setData(undefined)
-  }, [])
+  const [data, setData] = useState<typeof storage>(storage)
+  const [unlock, setUnlock] = useState<boolean>(false)
 
   return (
     <Data.Provider value={{ data, setData, setUnlock, unlock }}>

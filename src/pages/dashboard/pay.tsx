@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom'
 import SDK from "../../utility/sdk";
 import { Data } from "../../App";
 import ClipLoader from "react-spinners/ClipLoader";
-import Success from "../../components/pay/success";
-import Error from "../../components/pay/error";
+import Success from "../../components/success";
+import Error from "../../components/error";
 import { DropDownItem } from "../../types/dropdown";
 import { GetBalanceResponse, MultipleTransactionData } from "../../types/sdk";
 import CSV from '../../utility/importCSV'
@@ -120,7 +120,7 @@ const Pay = () => {
                         <div className="flex flex-col">
                             <span className="text-left">Paying From</span>
                             <div className="grid grid-cols-4">
-                                {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} price={true} selected={selectedWallet} list={[{ name: "Celo", type: 'celo', amount: `${data.celoBalance}` }, { name: "cUSD", type: 'cUsd', amount: `${data.cUSDBalance}` }]} />}
+                                {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={[{ name: "Celo", type: 'celo', amount: `${data.celoBalance}` }, { name: "cUSD", type: 'cUsd', amount: `${data.cUSDBalance}` }]} />}
                             </div>
                         </div>
                         <div className="flex flex-col">

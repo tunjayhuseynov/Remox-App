@@ -1,38 +1,46 @@
 import Input from "../input"
 import { useHistory } from 'react-router-dom'
-import SDK from "../../utility/sdk";
 import { useContext, useState } from 'react'
 import { Data } from "../../App";
 import { ClipLoader } from "react-spinners";
-import { LocalStorageData } from "../../types/context";
 import { SyntheticEvent } from "react";
+import { useCreatePasswordMutation } from "../../redux/api/account";
+import { useDispatch } from "react-redux";
+import { IStorage, setStorage } from "../../redux/reducers/storage";
 
 const CreatePassword = ({ phrase }: { phrase: string }) => {
+    const [createPassword, { data, error, isLoading }] = useCreatePasswordMutation();
+
+    const dispatch = useDispatch()
     const router = useHistory();
     const ctx = useContext(Data)
     const [loader, setLoader] = useState(false)
 
-    const Submitted = (e: SyntheticEvent<HTMLFormElement>) => {
+    const Submitted = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         const target = e.target as HTMLFormElement;
 
-        const sdk = new SDK()
         setLoader(true)
-        sdk.createPassword({ phrase: phrase.trim(), password: target["password"]?.value?.trim() }).then((data) => {
+
+        await createPassword({ phrase: phrase.trim(), password: target["password"]?.value?.trim() })
+
+        if (data) {
             setLoader(false)
-            const obj: LocalStorageData = {
+            const obj: IStorage = {
                 accountAddress: data.accountAddress,
                 encryptedPhrase: data.encryptedPhrase,
                 token: data.token,
             };
 
-            localStorage.setItem("user", JSON.stringify(obj));
+            dispatch(setStorage(JSON.stringify(obj)))
 
             ctx.setData!(obj)
             ctx.setUnlock!(true)
             router.push('/dashboard')
-
-        }).catch(w => { console.error(w); setLoader(false) })
+        } else if (error) {
+            setLoader(false)
+            console.error(error)
+        }
     }
 
     return <div className="h-screen">

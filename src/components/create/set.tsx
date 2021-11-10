@@ -1,16 +1,22 @@
 import React, { useMemo, useRef, useContext, FormEvent, Dispatch } from 'react';
 import Input from '../input'
 import { useHistory } from 'react-router-dom'
-import SDK from '../../utility/sdk';
 import { generate } from 'shortid'
 import { Data } from '../../App';
 import { AccountCreate } from '../../types/sdk';
 import { SyntheticEvent } from 'react';
 import { PassDataFromSetToPhrase } from '../../types/create'
+import { useDispatch } from 'react-redux';
+import { setStorage } from '../../redux/reducers/storage';
+import { useAccountCreateMutation } from '../../redux/api/account';
 
 // SET Component
 const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
-    const sdk = useRef(new SDK())
+
+    const [createAccount, { isLoading, data, error }] = useAccountCreateMutation()
+
+    const dispatch = useDispatch()
+
     const router = useHistory()
     const ctx = useContext(Data);
     const list = useMemo<Array<{ title: string, type?: string, name: string }>>(() => [
@@ -31,7 +37,9 @@ const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
             password: target["password"].value,
         }
 
-        sdk.current.accountCreate(inputData).then(data => {
+        await createAccount(inputData)
+
+        if (data) {
             const obj = {
                 accountAddress: data.accountAddress,
                 encryptedPhrase: data.encryptedPhrase,
@@ -41,7 +49,7 @@ const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
                 companyName: inputData.companyName,
             };
 
-            localStorage.setItem("user", JSON.stringify(obj));
+            dispatch(setStorage(JSON.stringify(obj)))
 
             ctx.setData!(obj)
 
@@ -51,8 +59,11 @@ const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
             }
 
             setData(pass)
+        } else if (error) {
+            console.error(error)
+        }
 
-        }).catch(e => console.error(e))
+
     }
 
     return <form onSubmit={create} className="h-full">

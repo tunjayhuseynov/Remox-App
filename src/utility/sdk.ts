@@ -6,7 +6,7 @@ import Customer from './sdk/customer'
 import Team from './sdk/team'
 import TeamMember from './sdk/teamMember'
 
-interface SDK extends Transaction, Account {}
+interface SDK extends Transaction, Account, Customer, TeamMember, Team {}
 
 class SDK{
     @use(Transaction, Account, Customer, Team, TeamMember) this:any

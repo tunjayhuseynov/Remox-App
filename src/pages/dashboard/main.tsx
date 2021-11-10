@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { CoinGeckoClient } from 'coingecko-api-v3';
+import { CoinGeckoClient, CoinMarketChartResponse } from 'coingecko-api-v3';
 import SDK from '../../utility/sdk';
 import { Data } from '../../App';
 import { ClipLoader } from 'react-spinners';
@@ -20,15 +20,21 @@ const Main = () => {
     const [ceurBalance, setCeurBalance] = useState<number>()
     const context = useContext(Data)
 
-    const getCurrency = async (id: string) => {
+    const getCurrency = (id: string, { signal }: { signal?: AbortSignal } = {}): Promise<CoinMarketChartResponse> => {
         const CoinGecko = new CoinGeckoClient();
 
-        return CoinGecko.coinIdMarketChart({ id: id, vs_currency: 'usd', days: 1 })
+        return new Promise(async (resolve, reject) => {
+            CoinGecko.coinIdMarketChart({ id: id, vs_currency: 'usd', days: 1 }).then(w => resolve(w))
+
+            signal?.addEventListener("abort", ()=>{
+                reject("Aborted")
+            })
+        })
     }
 
     useEffect(() => {
-
-        Promise.all([getCurrency("celo"), getCurrency("celo-dollar"), getCurrency("celo-euro")]).then(w => {
+        const controller = new AbortController()
+        Promise.all([getCurrency("celo", {signal: controller.signal}), getCurrency("celo-dollar", {signal: controller.signal}), getCurrency("celo-euro", {signal: controller.signal})]).then(w => {
 
             const [celoData, cusdData, ceurData] = w;
 
@@ -36,7 +42,11 @@ const Main = () => {
             setCUSD(cusdData.prices[cusdData.prices.length - 1][1])
             setCEUR(ceurData.prices[ceurData.prices.length - 1][1])
 
-        })
+        }).catch(e => console.error(e))
+
+        return () => {
+            controller.abort();
+        }
 
     }, [])
 

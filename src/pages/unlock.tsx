@@ -5,8 +5,11 @@ import { Data } from '../App';
 import SDK from '../utility/sdk'
 import { useLocation, useHistory } from 'react-router-dom'
 import { ClipLoader } from 'react-spinners';
+import { useDispatch } from 'react-redux';
+import { setStorage } from '../redux/reducers/storage';
 
 const Unlock = ({ setUnlock, unlock }: { setUnlock: Dispatch<boolean>, unlock: boolean }) => {
+    const dispatch = useDispatch();
     const data = useContext(Data)
     const inputRef = useRef<HTMLInputElement>(null)
     const location = useLocation()
@@ -25,7 +28,8 @@ const Unlock = ({ setUnlock, unlock }: { setUnlock: Dispatch<boolean>, unlock: b
             const sdk = new SDK(data?.data?.token)
             sdk.unlock(inputRef.current.value.trim()).then(e => {
                 if (e) {
-                    localStorage.setItem(`user`, JSON.stringify({ ...data.data, token: e.token }))
+                    dispatch(setStorage(JSON.stringify({ ...data.data, token: e.token })))
+
                     setUnlock(true)
                     setLoader(false)
                     router.push('/');
