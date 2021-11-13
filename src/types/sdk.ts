@@ -16,7 +16,10 @@ export * from './sdk/Customer/GetCustomer'
 export * from './sdk/Team/CreateTeam'
 export * from './sdk/Team/GetTeams'
 export * from './sdk/Team/UpdateTeam'
+export * from './sdk/Team/GetTeamsWithMembers'
 
 export * from './sdk/TeamMember/addMember'
 export * from './sdk/TeamMember/getMember'
 export * from './sdk/TeamMember/updatemember'
+
+export * from './sdk/blockscout'

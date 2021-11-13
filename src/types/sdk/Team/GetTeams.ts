@@ -1,4 +1,3 @@
-import { GetMemberResponse, Member } from "../TeamMember/getMember";
 
 export interface GetTeams {
     take?: number;
@@ -15,5 +14,4 @@ export interface TeamInfo {
     id: string,
     title: string,
     teamMembers: number, 
-    members?: Member[]
 }

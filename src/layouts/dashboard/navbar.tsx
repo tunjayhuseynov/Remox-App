@@ -3,11 +3,12 @@ import { BsSearch } from 'react-icons/bs'
 import { useState, useEffect, useCallback, useRef, useContext } from 'react'
 import { Link } from 'react-router-dom';
 import ClipLoader from "react-spinners/ClipLoader";
-import { Data } from '../../App';
+import { useAppSelector } from '../../redux/hooks';
+import { selectStorage } from '../../redux/reducers/storage';
 
 
 const Navbar = () => {
-    const data = useContext(Data)
+    const storage = useAppSelector(selectStorage)
 
     return <div className="grid grid-cols-5 gap-12">
         <div className="h-[50px] flex items-center pl-14">
@@ -20,7 +21,7 @@ const Navbar = () => {
             </div>
         </div>
         <div className="actions flex items-center justify-evenly col-span-2">
-            {data.data ? <Visitcard name="Remox" address={data.data.accountAddress} /> : <ClipLoader />}
+            {storage ? <Visitcard name="Remox" address={storage.accountAddress} /> : <ClipLoader />}
             <NavbarDropdown />
             <IoMdNotificationsOutline className="text-2xl" />
         </div>

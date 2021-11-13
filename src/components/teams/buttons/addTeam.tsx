@@ -1,42 +1,27 @@
 import { useRef, useState } from "react";
 import { ClipLoader } from "react-spinners";
-import { CoinsURL } from "../../../types/coins";
-import { DropDownItem } from "../../../types/dropdown";
-import SDK from "../../../utility/sdk";
-import Dropdown from "../../dropdown";
-import Error from "../../error";
-import Success from "../../success";
+
 import { useAppDispatch } from "../../../redux/hooks"
-import { changeSuccess, changeError } from '../../../redux/reducers/notificationSlice'
-import { useSelector } from "react-redux";
-import { selectStorage } from "../../../redux/reducers/storage";
+import { changeSuccess } from '../../../redux/reducers/notificationSlice'
+import { useCreateTeamMutation } from "../../../redux/api";
 
-const AddTeams = ({ onDisable, onSuccess }: { onDisable: React.Dispatch<boolean>, onSuccess?: React.Dispatch<boolean> }) => {
-    // const [selectedCoin, setSelectedCoin] = useState<DropDownItem>({ name: "Celo", coinUrl: CoinsURL.CELO })
+const AddTeams = ({ onDisable }: { onDisable: React.Dispatch<boolean>}) => {
 
-    const storage = useSelector(selectStorage)
+    const [createTeam, { data, error, isLoading }] = useCreateTeamMutation()
 
-    const [isLoading, setLoading] = useState(false)
     const teamName = useRef<HTMLInputElement>(null)
-    const [success, setSuccess] = useState(false)
-    const [error, setError] = useState(false)
     const dispatch = useAppDispatch()
 
-    const createTeam = async () => {
-        setError(false)
+    const create = async () => {
         if (teamName.current && teamName.current.value.trim()) {
-            setLoading(true)
             try {
-                const sdk = new SDK(storage!.token);
-                await sdk.CreateTeam({ title: teamName.current.value.trim() })
-                //onSuccess(true)
+                await createTeam({ title: teamName.current.value.trim() }).unwrap();
+
                 dispatch(changeSuccess(true))
                 onDisable(false)
             } catch (error) {
-                setError(true)
-                console.error(error)
+                console.log(error)
             }
-            setLoading(false)
         }
     }
 
@@ -55,7 +40,7 @@ const AddTeams = ({ onDisable, onSuccess }: { onDisable: React.Dispatch<boolean>
             </div>
         </div> */}
         <div className="flex justify-center">
-            <button onClick={createTeam} className="px-14 py-2 text-white rounded-xl bg-primary font-light" disabled={isLoading}>
+            <button onClick={create} className="px-14 py-2 text-white rounded-xl bg-primary font-light" disabled={isLoading}>
                 {isLoading ? <ClipLoader /> : "Add Team"}
             </button>
         </div>

@@ -12,6 +12,7 @@ export interface Member {
     address: string,
     amount: string,
     currency: CoinsName,
+    teamId: string,
 }
 
 export interface GetMemberResponse{

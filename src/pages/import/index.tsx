@@ -1,21 +1,23 @@
-import SDK from "../../utility/sdk";
 import { useRef, useState } from "react";
+import { ClipLoader } from "react-spinners";
 import CreatePassword from "../../components/import/createPassword";
 import Login from "../../components/import/login";
+import { useAccountExistMutation } from "../../redux/api";
 
 const Import = () => {
+    const [accountExist, { error, isLoading }] = useAccountExistMutation()
     const [input, setInput] = useState<string>()
     const [index, setIndex] = useState(0)
 
-    const Submitted = () => {
+    const Submitted = async () => {
         if (input) {
-            const sdk = new SDK();
-
-            sdk.accountExist({ phrase: input.trim() }).then(e => {
-                if (!e.result) setIndex(1)
+            try {
+                const data = await accountExist({ phrase: input.trim() }).unwrap()
+                if (!data!.result) setIndex(1)
                 else setIndex(2)
-
-            }).catch(e => console.error(e));
+            } catch (error) {
+                console.error(error)
+            }
         }
     }
 
@@ -31,7 +33,7 @@ const Import = () => {
                 <div>
                     <textarea onChange={(e) => setInput(e.target.value)} className="border-2 p-3 outline-none" placeholder="fish boot hand foot" cols={55} rows={7}></textarea>
                 </div>
-                <button onClick={Submitted} className="bg-primary text-white px-5 py-2 rounded-xl w-[200px]">Import Account</button>
+                <button onClick={Submitted} className="bg-primary text-white px-5 py-2 rounded-xl w-[200px]">{isLoading ? <ClipLoader /> : "Import Account"}</button>
             </div>
         </section>
             :

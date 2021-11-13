@@ -1,47 +1,50 @@
 import Input from "../input"
 import { useHistory } from 'react-router-dom'
-import { useContext, useState } from 'react'
-import { Data } from "../../App";
+import { useContext, useEffect, useState } from 'react'
 import { ClipLoader } from "react-spinners";
 import { SyntheticEvent } from "react";
 import { useCreatePasswordMutation } from "../../redux/api/account";
 import { useDispatch } from "react-redux";
-import { IStorage, setStorage } from "../../redux/reducers/storage";
+import { IStorage, selectStorage, setStorage } from "../../redux/reducers/storage";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setUnlock } from "../../redux/reducers/unlock";
 
 const CreatePassword = ({ phrase }: { phrase: string }) => {
-    const [createPassword, { data, error, isLoading }] = useCreatePasswordMutation();
+    const [createPassword, { isLoading }] = useCreatePasswordMutation();
 
-    const dispatch = useDispatch()
+    const dispatch = useAppDispatch()
     const router = useHistory();
-    const ctx = useContext(Data)
-    const [loader, setLoader] = useState(false)
+
+    const storage = useAppSelector(selectStorage)
+
 
     const Submitted = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         const target = e.target as HTMLFormElement;
 
-        setLoader(true)
+        try {
+            const data = await createPassword({ phrase: phrase.trim(), password: target["password"]?.value?.trim() }).unwrap()
 
-        await createPassword({ phrase: phrase.trim(), password: target["password"]?.value?.trim() })
-
-        if (data) {
-            setLoader(false)
             const obj: IStorage = {
-                accountAddress: data.accountAddress,
-                encryptedPhrase: data.encryptedPhrase,
-                token: data.token,
+                accountAddress: data!.accountAddress,
+                encryptedPhrase: data!.encryptedPhrase,
+                token: data!.token,
             };
 
             dispatch(setStorage(JSON.stringify(obj)))
+            dispatch(setUnlock(true))
 
-            ctx.setData!(obj)
-            ctx.setUnlock!(true)
             router.push('/dashboard')
-        } else if (error) {
-            setLoader(false)
+        } catch (error) {
             console.error(error)
         }
     }
+
+    useEffect(() => {
+        if (storage) {
+            router.push('/dashboard')
+        }
+    }, [storage])
 
     return <div className="h-screen">
         <form onSubmit={Submitted} className="h-full">
@@ -55,7 +58,7 @@ const CreatePassword = ({ phrase }: { phrase: string }) => {
                 </div>
                 <div className="flex justify-center items-center gap-10 pt-8">
                     <button className="rounded-xl w-[150px] h-[50px] border-2 border-primary text-primary shadow-lg bg-white" onClick={() => router.push('/')}>Back</button>
-                    <button type="submit" className="rounded-xl w-[150px] h-[50px] text-white shadow-lg bg-primary">{loader ? <ClipLoader /> : 'Set Password'}</button>
+                    <button type="submit" className="rounded-xl w-[150px] h-[50px] text-white shadow-lg bg-primary">{isLoading ? <ClipLoader /> : 'Set Password'}</button>
                 </div>
             </section>
         </form>

@@ -7,7 +7,7 @@ const Sidebarlist = () => {
         <ul>
             <Link to="/dashboard"><Li><DashboardSVG />Dashboard</Li></Link>
             <Li><PayrollSVG />Run Payroll</Li>
-            <Li><TransactionsSVG />Transactions</Li>
+            <Link to="/dashboard/transactions"><Li><TransactionsSVG />Transactions</Li></Link>
             <Li><SwapSVG />Swap</Li>
             <Li><AssetsSVG />Assets</Li>
             <Link to="/dashboard/teams"><Li><TeamsSVG />Teams</Li></Link>

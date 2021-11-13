@@ -1,15 +1,27 @@
 import { useState, useEffect, useContext } from 'react';
 import { CoinGeckoClient, CoinMarketChartResponse } from 'coingecko-api-v3';
-import SDK from '../../utility/sdk';
-import { Data } from '../../App';
 import { ClipLoader } from 'react-spinners';
 import CoinItem from '../../components/dashboard/main/coinitem';
 import TransactionHistory from '../../components/dashboard/main/transactionHistory'
+import { useAppDispatch, useAppSelector } from '../../redux/hooks';
+import storage, { selectStorage } from '../../redux/reducers/storage';
+import { useGetBalanceQuery, useGetTransactionsQuery } from '../../redux/api';
+import { SelectCelo, SelectCeur, SelectCusd, updateAllCurrencies } from '../../redux/reducers/currencies';
 
 const Main = () => {
-    const [celo, setCelo] = useState<number>()
-    const [cusd, setCUSD] = useState<number>()
-    const [ceur, setCEUR] = useState<number>()
+    const dispatch = useAppDispatch()
+    const storage = useAppSelector(selectStorage)
+    const { data, error, isLoading } = useGetBalanceQuery()
+
+    const { data: transactions, error: transactionError, } = useGetTransactionsQuery({ address: storage!.accountAddress, take: 4 })
+
+    // const [celo, setCelo] = useState<number>()
+    // const [cusd, setCUSD] = useState<number>()
+    // const [ceur, setCEUR] = useState<number>()
+
+    const celo = useAppSelector(SelectCelo)
+    const cusd = useAppSelector(SelectCusd)
+    const ceur = useAppSelector(SelectCeur)
 
     const [percent, setPercent] = useState<number>()
     const [coin, setCoin] = useState<number>()
@@ -18,7 +30,6 @@ const Main = () => {
     const [celoBalance, setCeloBalance] = useState<number>()
     const [cusdBalance, setCusdBalance] = useState<number>()
     const [ceurBalance, setCeurBalance] = useState<number>()
-    const context = useContext(Data)
 
     const getCurrency = (id: string, { signal }: { signal?: AbortSignal } = {}): Promise<CoinMarketChartResponse> => {
         const CoinGecko = new CoinGeckoClient();
@@ -26,21 +37,27 @@ const Main = () => {
         return new Promise(async (resolve, reject) => {
             CoinGecko.coinIdMarketChart({ id: id, vs_currency: 'usd', days: 1 }).then(w => resolve(w))
 
-            signal?.addEventListener("abort", ()=>{
+            signal?.addEventListener("abort", () => {
                 reject("Aborted")
             })
         })
     }
 
+
     useEffect(() => {
         const controller = new AbortController()
-        Promise.all([getCurrency("celo", {signal: controller.signal}), getCurrency("celo-dollar", {signal: controller.signal}), getCurrency("celo-euro", {signal: controller.signal})]).then(w => {
+        Promise.all([getCurrency("celo", { signal: controller.signal }), getCurrency("celo-dollar", { signal: controller.signal }), getCurrency("celo-euro", { signal: controller.signal })]).then(w => {
 
             const [celoData, cusdData, ceurData] = w;
 
-            setCelo(celoData.prices[celoData.prices.length - 1][1])
-            setCUSD(cusdData.prices[cusdData.prices.length - 1][1])
-            setCEUR(ceurData.prices[ceurData.prices.length - 1][1])
+            // setCelo(celoData.prices[celoData.prices.length - 1][1])
+            // setCUSD(cusdData.prices[cusdData.prices.length - 1][1])
+            // setCEUR(ceurData.prices[ceurData.prices.length - 1][1])
+            dispatch(updateAllCurrencies([
+                celoData.prices[celoData.prices.length - 1][1],
+                cusdData.prices[cusdData.prices.length - 1][1],
+                ceurData.prices[ceurData.prices.length - 1][1]
+            ]))
 
         }).catch(e => console.error(e))
 
@@ -51,21 +68,20 @@ const Main = () => {
     }, [])
 
     useEffect(() => {
-        if (celo && cusd && ceur && context && context.data && context.data.token) {
-            const sdk = new SDK(context.data.token)
-
-            sdk.getBalances().then(w => {
-                setCeloBalance(parseFloat(w.celoBalance))
-                setCusdBalance(parseFloat(w.cUSDBalance))
-                setCeurBalance(0)
-                const total = parseFloat(w.celoBalance) + parseFloat(w.cUSDBalance)
-                setCoin(total)
-                const result: number = (celo * parseFloat(w.celoBalance)) + (cusd * parseFloat(w.cUSDBalance))
-                setBalance(result.toFixed(2))
-                setPercent(0.7)
-            })
+        if (celo && cusd && ceur && storage && storage.token && data) {
+            setCeloBalance(parseFloat(data.celoBalance))
+            setCusdBalance(parseFloat(data.cUSDBalance))
+            setCeurBalance(0)
+            const total = parseFloat(data.celoBalance) + parseFloat(data.cUSDBalance)
+            setCoin(total)
+            const result: number = (celo * parseFloat(data.celoBalance)) + (cusd * parseFloat(data.cUSDBalance))
+            setBalance(result.toFixed(2))
+            setPercent(0.7)
         }
-    }, [celo, cusd, ceur, context, context.data])
+        if (error) console.error(error)
+    }, [celo, cusd, ceur, storage, data, error])
+
+
     return <main className="grid grid-cols-2 w-full gap-5">
         <div className="grid grid-cols-2 gap-8">
             <div className="col-span-2 flex flex-col">
@@ -126,8 +142,8 @@ const Main = () => {
             }
         </div>
 
-        <div id="transaction" className="pr-14 pb-14">
-            <TransactionHistory />
+        <div id="transaction" className="pb-14">
+            {transactions ? <TransactionHistory transactions={transactions} /> : <div className="flex justify-center"> <ClipLoader /></div>}
         </div>
     </main>
 }

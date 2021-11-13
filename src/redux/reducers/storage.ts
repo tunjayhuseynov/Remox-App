@@ -10,13 +10,18 @@ export interface IStorage {
     companyName?: string,
 }
 
-const initialState = (): IStorage | undefined => {
+interface IContainer {
+    user: IStorage | null
+}
+
+const initialState = (): IContainer => {
     const val = localStorage.getItem("user")
 
     if (val) {
         const data: IStorage = JSON.parse(val)
-        return data;
+        return { user: data }
     }
+    return { user: null };
 }
 
 
@@ -26,13 +31,14 @@ export const storageSlice = createSlice({
     reducers: {
         setStorage: (state, action) => {
             localStorage.setItem("user", action.payload)
-            state = JSON.parse(action.payload)
+            const data: IStorage = JSON.parse(action.payload)
+            state.user = data
         }
     }
 })
 
 export const { setStorage } = storageSlice.actions
 
-export const selectStorage = (state: RootState) => state.storage
+export const selectStorage = (state: RootState) => state.storage.user
 
 export default storageSlice.reducer

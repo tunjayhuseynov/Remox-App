@@ -2,7 +2,6 @@ import React, { useMemo, useRef, useContext, FormEvent, Dispatch } from 'react';
 import Input from '../input'
 import { useHistory } from 'react-router-dom'
 import { generate } from 'shortid'
-import { Data } from '../../App';
 import { AccountCreate } from '../../types/sdk';
 import { SyntheticEvent } from 'react';
 import { PassDataFromSetToPhrase } from '../../types/create'
@@ -13,12 +12,12 @@ import { useAccountCreateMutation } from '../../redux/api/account';
 // SET Component
 const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
 
-    const [createAccount, { isLoading, data, error }] = useAccountCreateMutation()
+    const [createAccount, { isLoading}] = useAccountCreateMutation()
 
     const dispatch = useDispatch()
 
     const router = useHistory()
-    const ctx = useContext(Data);
+
     const list = useMemo<Array<{ title: string, type?: string, name: string }>>(() => [
         { title: "First Name", name: "userName" }, { title: "Last Name", name: "surname" },
         { title: "Organization Name", name: "companyName" }, { title: "Password", name: "password", type: "password" },
@@ -37,9 +36,9 @@ const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
             password: target["password"].value,
         }
 
-        await createAccount(inputData)
+        try {
+            const data = await createAccount(inputData).unwrap()
 
-        if (data) {
             const obj = {
                 accountAddress: data.accountAddress,
                 encryptedPhrase: data.encryptedPhrase,
@@ -51,19 +50,15 @@ const Set = ({ setData }: { setData: Dispatch<PassDataFromSetToPhrase> }) => {
 
             dispatch(setStorage(JSON.stringify(obj)))
 
-            ctx.setData!(obj)
-
             const pass: PassDataFromSetToPhrase = {
                 accountAddress: data.accountAddress,
                 mnemonic: data.mnemonic,
             }
 
             setData(pass)
-        } else if (error) {
+        } catch (error) {
             console.error(error)
         }
-
-
     }
 
     return <form onSubmit={create} className="h-full">

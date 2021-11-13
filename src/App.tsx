@@ -10,57 +10,46 @@ import {
 import Pay from './pages/dashboard/pay';
 import Home from './pages/home';
 import Create from './pages/create';
-import { createContext, ReactNode, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Unlock from './pages/unlock';
 import Import from './pages/import/index';
-import { CustomContext } from './types/context'
 import Teams from './pages/teams/index'
 import Main from './pages/dashboard/main'
-import { useSelector } from 'react-redux';
-import { selectStorage } from './redux/reducers/storage';
+import Transactions from './pages/transactions/transactions'
+import { IStorage, selectStorage } from './redux/reducers/storage';
+import { selectUnlock } from './redux/reducers/unlock';
+import { useAppSelector } from './redux/hooks';
 
-
-export const Data = createContext<CustomContext>({
-  unlock: false,
-  data: undefined,
-  setData: undefined,
-  setUnlock: undefined,
-})
 
 function App(): JSX.Element {
-  const storage = useSelector(selectStorage)
-
-  const [data, setData] = useState<typeof storage>(storage)
-  const [unlock, setUnlock] = useState<boolean>(false)
+  const storage = useAppSelector(selectStorage)
+  const unlock = useAppSelector(selectUnlock)
 
   return (
-    <Data.Provider value={{ data, setData, setUnlock, unlock }}>
-      <div className="App min-h-screen w-full">
-        <Router>
-          <Switch>
-            <Route path="/unlock" exact >
-              <Unlock setUnlock={setUnlock} unlock={unlock} />
-            </Route>
-            <CustomRouter unlock={unlock} data={data} />
-          </Switch>
-        </Router>
-      </div>
-    </Data.Provider>
+    <div className="App min-h-screen w-full">
+      <Router>
+        <Switch>
+          <Route path="/unlock" exact >
+            <Unlock />
+          </Route>
+          <CustomRouter unlock={unlock} data={storage} />
+        </Switch>
+      </Router>
+    </div>
   );
 }
 
-const CustomRouter = ({ unlock, data }: { unlock: boolean, data: any }) => {
+const CustomRouter = ({ unlock, data }: { unlock: boolean, data: IStorage | null}) => {
   const router = useHistory();
   const location = useLocation();
 
   useEffect(() => {
     if (router && data && unlock && location && location.pathname === '/') router.push('/dashboard')
-
-
   }, [unlock, router, data, location])
 
   const unlockChecking = (element: JSX.Element | Array<JSX.Element>) => {
     if (unlock) return element
+    if((location.pathname === '/create' || location.pathname === '/import' || location.pathname === '/') && !data?.accountAddress) return element
 
     return <Redirect
       to={{
@@ -69,7 +58,6 @@ const CustomRouter = ({ unlock, data }: { unlock: boolean, data: any }) => {
       }}
     />
   }
-
 
   return <>
     <Route path="/" exact render={() => unlockChecking(<Home />)} />
@@ -91,8 +79,8 @@ const AuthRouter = ({ data, unlockChecking }: { data: any, unlockChecking: Funct
     <Route path={'/dashboard'} exact render={() => unlockChecking(<Dashboard ><Main /></Dashboard>)} />
     <Route path={'/dashboard/pay'} exact render={() => unlockChecking(<Pay />)} />
     <Route path={'/dashboard/teams'} exact render={() => unlockChecking(<Dashboard><Teams /></Dashboard>)} />
+    <Route path={'/dashboard/transactions'} exact render={() => unlockChecking(<Dashboard><Transactions /></Dashboard>)} />
   </>
-
 }
 
 export default App;

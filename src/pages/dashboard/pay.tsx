@@ -2,14 +2,15 @@ import React, { useState, useRef, useEffect, useContext, useCallback, SyntheticE
 import Dropdown from "../../components/dropdown";
 import { generate } from 'shortid'
 import { useHistory } from 'react-router-dom'
-import SDK from "../../utility/sdk";
-import { Data } from "../../App";
 import ClipLoader from "react-spinners/ClipLoader";
 import Success from "../../components/success";
 import Error from "../../components/error";
 import { DropDownItem } from "../../types/dropdown";
-import { GetBalanceResponse, MultipleTransactionData } from "../../types/sdk";
+import { MultipleTransactionData } from "../../types/sdk";
 import CSV from '../../utility/importCSV'
+import { useGetBalanceQuery, useSendCeloMutation, useSendCUSDMutation, useSendMultipleTransactionsMutation } from "../../redux/api";
+import { useSelector } from "react-redux";
+import { selectStorage } from "../../redux/reducers/storage";
 
 const Input = ({ index, name, address, amount }: { index: number, name: Array<string>, address: Array<string>, amount: Array<string> }) => <>
     <input className="border text-black px-3 py-1 rounded-md" placeholder="Name" defaultValue={name[index]} type="text" name={`name__${index}`} onChange={(e) => name[index] = e.target.value} required />
@@ -19,19 +20,28 @@ const Input = ({ index, name, address, amount }: { index: number, name: Array<st
 </>
 
 const Pay = () => {
-    const context = useContext(Data)
+
+    const storage = useSelector(selectStorage)
+    const router = useHistory();
+
+    const { data } = useGetBalanceQuery()
+    const [sendCelo] = useSendCeloMutation()
+    const [sendCusd] = useSendCUSDMutation()
+    const [sendMultiple] = useSendMultipleTransactionsMutation()
+
+
     const [index, setIndex] = useState(1)
-    const [data, setData] = useState<GetBalanceResponse>()
     const [isPaying, setIsPaying] = useState(false)
     const [isSuccess, setSuccess] = useState(false)
     const [isError, setError] = useState(false)
+
+
     const nameRef = useRef<Array<string>>([])
     const addressRef = useRef<Array<string>>([])
     const amountRef = useRef<Array<string>>([])
 
     const [csvImport, setCsvImport] = useState<string[][]>([]);
-    const router = useHistory();
-    const sdk = useRef<SDK>();
+
     const fileInput = useRef<HTMLInputElement>(null);
 
     const [selectedWallet, setSelectedWallet] = useState<DropDownItem>();
@@ -44,17 +54,11 @@ const Pay = () => {
                 addressRef.current.push(address);
                 amountRef.current.push(amount);
             }
-            setIndex((index===1?0:index) + csvImport.length)
+            setIndex((index === 1 ? 0 : index) + csvImport.length)
             fileInput.current!.files = new DataTransfer().files;
         }
     }, [csvImport])
 
-    useEffect(() => {
-        if (context.data) {
-            sdk.current = new SDK(context.data.token)
-            sdk.current.getBalances().then(data => setData(data)).catch(e => console.error(e))
-        }
-    }, [context.data])
 
     useEffect(() => {
         if (data) {
@@ -62,7 +66,7 @@ const Pay = () => {
         }
     }, [data])
 
-    const Submit = (e: SyntheticEvent<HTMLFormElement>) => {
+    const Submit = async (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         const result: Array<MultipleTransactionData> = []
@@ -79,34 +83,46 @@ const Pay = () => {
             }
         }
 
-        if (result.length === 1 && sdk.current && selectedWallet && selectedWallet.name) {
-            setIsPaying(true)
-            if (selectedWallet!.name.toLowerCase() === "celo") {
-                sdk.current.sendCelo({
-                    toAddress: result[0].toAddress,
-                    amount: result[0].amount,
-                    phrase: context.data!.encryptedPhrase
-                }).then(w => { setIsPaying(false); setSuccess(true); }).catch(w => { console.error(w); setError(true); setIsPaying(false); })
-            } else if (selectedWallet.name.toLowerCase() === "cusd") {
-                sdk.current.sendCUSD({
-                    toAddress: result[0].toAddress,
-                    amount: result[0].amount,
-                    phrase: context.data!.encryptedPhrase
-                }).then(w => { setIsPaying(false); setSuccess(true); }).catch(w => { console.error(w); setError(true); setIsPaying(false); })
+        setIsPaying(true)
+
+        try {
+            if (result.length === 1 && selectedWallet && selectedWallet.name) {
+                if (selectedWallet!.name.toLowerCase() === "celo") {
+                    await sendCelo({
+                        toAddress: result[0].toAddress,
+                        amount: result[0].amount,
+                        phrase: storage!.encryptedPhrase
+                    }).unwrap
+
+                } else if (selectedWallet.name.toLowerCase() === "cusd") {
+
+                    await sendCusd({
+                        toAddress: result[0].toAddress,
+                        amount: result[0].amount,
+                        phrase: storage!.encryptedPhrase
+                    }).unwrap()
+                }
             }
-        }
-        else if (result.length > 1 && sdk.current) {
-            setIsPaying(true)
-            const arr: Array<MultipleTransactionData> = result.map(w => {
-                return {
+            else if (result.length > 1) {
+                const arr: Array<MultipleTransactionData> = result.map(w => ({
                     toAddress: w.toAddress,
                     amount: w.amount,
                     walletType: w.walletType
-                }
-            })
-            sdk.current.sendMultipleTransactions(arr).then(e => { setIsPaying(false); setSuccess(true); }).catch(err => { console.error(err); setError(true); setIsPaying(false); })
+                }))
+
+                await sendMultiple({
+                    multipleAddresses: arr,
+                    phrase: storage!.encryptedPhrase
+                }).unwrap()
+            }
+            setSuccess(true);
+
+        } catch (error) {
+            console.error(error)
+            setError(true)
         }
 
+        setIsPaying(false);
     }
 
     return <div className="px-32">
@@ -131,7 +147,7 @@ const Pay = () => {
                                 }} className="px-2 py-1 shadow-lg border border-primary text-primary rounded-xl text-sm font-light hover:text-white hover:bg-primary">
                                     + Import CSV
                                 </button>
-                                <input ref={fileInput} type="file" className="hidden" onChange={(e) => e.target.files!.length>0?CSV.Import(e.target.files![0]).then(e => setCsvImport(e)).catch(e=>console.error(e)):null} />
+                                <input ref={fileInput} type="file" className="hidden" onChange={(e) => e.target.files!.length > 0 ? CSV.Import(e.target.files![0]).then(e => setCsvImport(e)).catch(e => console.error(e)) : null} />
                             </div>
                             <div className="grid grid-cols-[25%,45%,25%,5%] gap-5">
                                 {Array(index).fill(" ").map((e, i) => <Input key={generate()} index={i} name={nameRef.current} address={addressRef.current} amount={amountRef.current} />)}

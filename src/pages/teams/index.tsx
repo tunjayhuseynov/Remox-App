@@ -3,22 +3,23 @@ import TeamContainer from '../../components/teams/teamContainer'
 import Modal from '../../components/modal'
 import AddTeams from '../../components/teams/buttons/addTeam'
 import AddMember from '../../components/teams/buttons/addMember'
-import SDK from '../../utility/sdk'
 import { ClipLoader } from 'react-spinners';
-import { TeamInfo } from '../../types/sdk/Team/GetTeams';
+import { TeamInfoWithMembers } from '../../types/sdk/Team/GetTeamsWithMembers';
 import { generate } from 'shortid';
 import Success from '../../components/success';
-
 import { useAppSelector, useAppDispatch } from '../../redux/hooks'
 import { changeError, changeSuccess, selectError, selectSuccess } from '../../redux/reducers/notificationSlice'
 import Error from '../../components/error';
-import { useSelector } from 'react-redux';
-import { selectStorage } from '../../redux/reducers/storage';
+import { useGetTeamsWithMembersQuery, useLazyGetTeamsWithMembersQuery } from '../../redux/api';
 
 
 const Teams = () => {
 
-    const storage = useSelector(selectStorage)
+    const [teamCount] = useState(3)
+    const [skipCount, setSkipCount] = useState(0)
+
+    const { data, isLoading, refetch } = useGetTeamsWithMembersQuery({ take: teamCount, skip: skipCount })
+    const [trigger, result] = useLazyGetTeamsWithMembersQuery();
 
 
     const isSuccess = useAppSelector(selectSuccess)
@@ -27,65 +28,31 @@ const Teams = () => {
 
     const [addTeamModal, setAddTeamModal] = useState(false)
     const [addMemberModal, setAddMemberModal] = useState(false)
-    const [isLoading, setLoading] = useState(false)
-    const [teams, setTeams] = useState<TeamInfo[]>([])
 
-
-    const [teamCount] = useState(3)
-    const [skipCount, setSkipCount] = useState(0)
-
+    const [teams, setTeams] = useState<TeamInfoWithMembers[]>([])
 
     const maxTeamCount = useRef(0)
 
     useEffect(() => {
-        (async () => {
-
-            setLoading(true)
-            try {
-                const sdk = new SDK(storage!.token);
-                const res = await sdk.GetTeams({ take: teamCount, skip: skipCount })
-
-                const idList = res.teams.map(w => sdk.GetMembers(w.id, { take: 3 }))
-
-                const allRes = await Promise.all(idList)
-                maxTeamCount.current = res.total;
-                setTeams([...teams, ...res.teams.map((w, i): TeamInfo => { return { ...w, members: allRes[i].members } })])
-
-            } catch (error) {
-                console.error(error)
-                setLoading(false)
-            }
-
-        })()
-    }, [teamCount, skipCount])
+        if (data) {
+            setTeams([...teams, ...data.teams]);
+            maxTeamCount.current = data.total
+        }
+    }, [data])
 
     useEffect(() => {
-        (async () => {
-            if (isSuccess) {
-
-                setLoading(true)
-                try {
-                    const sdk = new SDK(storage!.token);
-                    const res = await sdk.GetTeams({ take: teams.length, skip: 0 })
-
-                    const idList = res.teams.map(w => sdk.GetMembers(w.id, { take: 3 }))
-                    const allRes = await Promise.all(idList)
-                    maxTeamCount.current = res.total;
-                    setTeams(res.teams.map((w, i): TeamInfo => { return { ...w, members: allRes[i].members } }))
-                } catch (error) {
-                    console.error(error)
-                    setLoading(false)
-                }
-
-            }
-        })()
+        if (isSuccess) {
+            refetch()
+            trigger({ take: teams.length, skip: 0 })
+        }
     }, [isSuccess])
 
     useEffect(() => {
-        if (teams.length > 0) {
-            setLoading(false)
+        if (result.data?.teams) {
+            setTeams(result.data?.teams)
         }
-    }, [teams])
+    }, [result.data])
+
 
     return <div>
         <div className="flex justify-between pb-5">
@@ -105,10 +72,10 @@ const Teams = () => {
                 <div className="font-normal">Wallet Address</div>
             </div>
             <div>
-                {teams.map(w => w && w.members && w.members.length > 0 ? <Fragment key={generate()}><TeamContainer teamName={w.title} members={w.members} /></Fragment> : undefined)}
-                {teams.map(w => w && w.members && w.members.length === 0 ? <Fragment key={generate()}><TeamContainer teamName={w.title} members={w.members} /></Fragment> : undefined)}
+                {teams.map(w => w && w.teamMembers && w.teamMembers.length > 0 ? <Fragment key={generate()}><TeamContainer {...w} /></Fragment> : undefined)}
+                {teams.map(w => w && w.teamMembers && w.teamMembers.length === 0 ? <Fragment key={generate()}><TeamContainer {...w} /></Fragment> : undefined)}
 
-                {isLoading && <div className="flex justify-center py-10"><ClipLoader /></div>}
+                {(isLoading || result.isLoading) && <div className="flex justify-center py-10"><ClipLoader /></div>}
             </div>
         </div>
         {teams.length < maxTeamCount.current && <div className="flex justify-center py-4">
@@ -116,6 +83,7 @@ const Teams = () => {
                 if (maxTeamCount.current - teams.length < teamCount) {
                     setSkipCount(maxTeamCount.current - (maxTeamCount.current - teams.length))
                 } else {
+                    console.log(teams.length)
                     setSkipCount(teams.length)
                 }
             }}>

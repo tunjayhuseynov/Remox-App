@@ -17,8 +17,14 @@ export enum CoinsNameVisual {
     cEUR = "cEur"
 }
 
-export const Coins = {
-    celo: { name: "Celo", coinUrl: CoinsURL.CELO, value: CoinsName.CELO },
-    cUsd: { name: "cUSD", coinUrl: CoinsURL.cUSD, value: CoinsName.cUSD},
-    cEur: { name: "cEUR", coinUrl: CoinsURL.cEUR, value: CoinsName.cEUR }
+export enum TransactionFeeTokenName {
+    cGLD = "celo",
+    cUSD = "cUsd",
+    cEUR = "cEur",
 }
+export const Coins = {
+    celo: { name: "Celo", coinUrl: CoinsURL.CELO, value: CoinsName.CELO, feeName: TransactionFeeTokenName.cGLD },
+    cUsd: { name: "cUSD", coinUrl: CoinsURL.cUSD, value: CoinsName.cUSD, feeName: TransactionFeeTokenName.cUSD},
+    cEur: { name: "cEUR", coinUrl: CoinsURL.cEUR, value: CoinsName.cEUR, feeName: TransactionFeeTokenName.cEUR }
+}
+

@@ -1,8 +1,9 @@
 import { Dispatch } from "react";
-import { CoinsNameVisual } from "../../../types/coins";
+import { Coins, CoinsNameVisual } from "../../../types/coins";
+import { Member } from "../../../types/sdk";
 import Avatar from '../../avatar'
 
-const Profile = ({ name, teamName, amount, coinName, walletAddress, onDeleteModal, onCurrentModal }: { name: string, amount: string, coinName: CoinsNameVisual | string, teamName: string, walletAddress: string, onDeleteModal: Dispatch<boolean>, onCurrentModal: Dispatch<boolean> }) => {
+const Profile = (props: Member & { teamName: string, onDeleteModal: Dispatch<boolean>, onCurrentModal: Dispatch<boolean>, onEditModal: Dispatch<boolean> }) => {
 
     return <>
         <div>
@@ -14,9 +15,9 @@ const Profile = ({ name, teamName, amount, coinName, walletAddress, onDeleteModa
                     <div className="font-bold">Name</div>
                     <div>
                         <div className="flex space-x-2 items-center">
-                            <Avatar name={name} />
+                            <Avatar name={props.name} />
                             <div>
-                                {name}
+                                {props.name}
                             </div>
                         </div>
                     </div>
@@ -26,7 +27,7 @@ const Profile = ({ name, teamName, amount, coinName, walletAddress, onDeleteModa
                     <div>
                         <div className="flex space-x-2 items-center">
                             <div>
-                                {teamName}
+                                {props.teamName}
                             </div>
                         </div>
                     </div>
@@ -36,10 +37,10 @@ const Profile = ({ name, teamName, amount, coinName, walletAddress, onDeleteModa
                     <div>
                         <div className="flex space-x-2 items-center">
                             <div>
-                                {amount}
+                                {props.amount}
                             </div>
                             <div>
-                                {coinName}
+                                <img src={Coins[props.currency].coinUrl} alt=""/>
                             </div>
                         </div>
                     </div>
@@ -49,7 +50,7 @@ const Profile = ({ name, teamName, amount, coinName, walletAddress, onDeleteModa
                     <div>
                         <div className="flex space-x-2 items-center">
                             <div className="text-xs">
-                                {walletAddress}
+                                {props.address}
                             </div>
                         </div>
                     </div>
@@ -63,14 +64,17 @@ const Profile = ({ name, teamName, amount, coinName, walletAddress, onDeleteModa
                         </button>
                     </div>
                     <div>
-                        <button className="bg-primary w-full rounded-xl text-white px-6 py-3">
+                        <button className="bg-primary w-full rounded-xl text-white px-6 py-3" onClick={() => {
+                            props.onEditModal(true)
+                            props.onCurrentModal(false)
+                        }}>
                             Edit
                         </button>
                     </div>
                     <div>
                         <button className="text-primary border border-primary w-full rounded-xl px-6 py-3" onClick={() => {
-                            onDeleteModal(true)
-                            onCurrentModal(false)
+                            props.onDeleteModal(true)
+                            props.onCurrentModal(false)
                         }}>
                             Delete
                         </button>

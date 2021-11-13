@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BaseUrl } from '../../utility/const'
-import { CreateTeam, CreateTeamResponse, GetTeams, GetTeamsResponse, UpdateTeam, UpdateTeamResponse } from '../../types/sdk'
+import { CreateTeam, CreateTeamResponse, GetTeams, GetTeamsResponse, GetTeamsWithMembers, GetTeamsWithMembersResponse, UpdateTeam, UpdateTeamResponse } from '../../types/sdk'
 import { RootState } from '../store';
 
 export const teamAPI = createApi({
@@ -8,7 +8,7 @@ export const teamAPI = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: BaseUrl,
     prepareHeaders: (headers, { getState }) => {
-      const token = (getState() as RootState).storage!.token;
+      const token = (getState() as RootState).storage?.user?.token;
       if (token) {
         headers.set('Authorization', `Bearer ${token}`);
       }
@@ -31,14 +31,21 @@ export const teamAPI = createApi({
       })
     }),
 
-    deleteTeam: builder.mutation<any, number>({
+    getTeamsWithMembers: builder.query<GetTeamsWithMembersResponse, GetTeamsWithMembers>({
+      query: (data) => ({
+        url: `/team/byAccount/withMembers`,
+        params: data
+      })
+    }),
+
+    deleteTeam: builder.mutation<any, string>({
       query: (id) => ({
         url: `/team/${id}`,
         method: 'DELETE'
       })
     }),
 
-    updateTeam: builder.mutation<UpdateTeamResponse, { id: number, body: UpdateTeam }>({
+    updateTeam: builder.mutation<UpdateTeamResponse, { id: string, body: UpdateTeam }>({
       query: ({ id, body }) => ({
         url: `/team/${id}`,
         method: 'PATCH',
@@ -49,4 +56,4 @@ export const teamAPI = createApi({
 })
 
 
-export const { useCreateTeamMutation, useGetTeamsQuery, useDeleteTeamMutation, useUpdateTeamMutation } = teamAPI
+export const { useCreateTeamMutation, useGetTeamsQuery, useLazyGetTeamsWithMembersQuery ,useGetTeamsWithMembersQuery, useDeleteTeamMutation, useUpdateTeamMutation } = teamAPI
