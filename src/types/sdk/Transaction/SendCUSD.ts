@@ -1,9 +1,12 @@
-export interface SendCusd {
+import { StableTokens } from "../../coins";
+
+export interface SendStableToken {
     toAddress: string,
     amount: string,
-    phrase: string
+    phrase: string,
+    stableTokenType: StableTokens
 }
 
-export interface SendCusdResponse {
+export interface SendStableTokenResponse {
 
 }

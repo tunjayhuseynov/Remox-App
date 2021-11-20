@@ -6,5 +6,5 @@ export interface SendMultipleTransaction {
 export interface MultipleTransactionData {
     toAddress: string,
     amount: string,
-    walletType: string
+    tokenType: string
 }

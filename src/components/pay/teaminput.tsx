@@ -55,8 +55,8 @@ const TeamInput = (props: Member & { index: number, selectedId: string[], genera
             }} />
             <h2 className={`text-black px-3 py-1 name__${props.index} text-sm`}>{props.name}</h2>
         </div>
-        <div>
-            <h2 className={`text-black px-3 py-1 rounded-md address__${props.index} text-sm`}>{props.address}</h2>
+        <div className="flex items-center">
+            <h2 className={`text-black py-1 rounded-md address__${props.index} text-sm`}>{props.address}</h2>
         </div>
         <div className="flex border border-greylish rounded-md border-opacity-60">
             {!selectedWallet ? <ClipLoader /> : <Dropdown className="border-transparent text-sm" onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={Object.values(Coins).map(w => ({ name: w.name, type: w.value, coinUrl: w.coinUrl, value: w.value }))} />}

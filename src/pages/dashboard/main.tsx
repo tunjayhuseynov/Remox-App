@@ -13,7 +13,7 @@ const Main = () => {
     const storage = useAppSelector(selectStorage)
     const { data, error, isLoading } = useGetBalanceQuery()
 
-    const { data: transactions, error: transactionError, } = useGetTransactionsQuery({ address: storage!.accountAddress, take: 4 })
+    const { data: transactions, error: transactionError, } = useGetTransactionsQuery({ address: storage!.accountAddress, take: 100 })
 
     // const [celo, setCelo] = useState<number>()
     // const [cusd, setCUSD] = useState<number>()
@@ -143,7 +143,7 @@ const Main = () => {
         </div>
 
         <div id="transaction" className="pb-14">
-            {transactions ? <TransactionHistory transactions={transactions} /> : <div className="flex justify-center"> <ClipLoader /></div>}
+            {transactions ? <TransactionHistory transactions={transactions.slice(0,4)} /> : <div className="flex justify-center"> <ClipLoader /></div>}
         </div>
     </main>
 }

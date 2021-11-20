@@ -10,6 +10,7 @@ import { SelectCurrencies } from "../../redux/reducers/currencies";
 import { selectStorage } from "../../redux/reducers/storage";
 import { Coins, TransactionFeeTokenName } from "../../types/coins";
 import { TransactionDirection, TransactionStatus, TransactionType } from "../../types/dashboard/transaction";
+import { CSVLink } from "react-csv";
 
 
 const Transactions = () => {
@@ -30,20 +31,29 @@ const Transactions = () => {
     useEffect(() => {
         if (transactions) {
             transactions.reduce((acc, cur) => {
-                 
+
                 return acc;
-            },[])
+            }, [])
         }
     }, [transactions])
 
     return <>
         <div>
             <div className="w-full shadow-custom px-5 pt-4 pb-6 rounded-xl">
-                <div id="header" className="grid grid-cols-[1fr,1fr,1fr,0.3fr] border-b border-black pb-5 px-5 pr-10" >
-                    <div className="font-normal">Recent Transactions</div>
-                    <div className="font-normal">Total Amount</div>
-                    <div className="font-normal">Status</div>
-                    <div className="font-normal place-self-end">Export</div>
+                <div id="header" className="grid grid-cols-[45%,30%,10%,15%] border-b border-black pb-5 pl-5" >
+                    <div className="font-semibold">Recent Transactions</div>
+                    <div className="font-semibold">Total Amount</div>
+                    <div className="font-semibold">Status</div>
+                    {transactions && <CSVLink className="font-normal place-self-end px-5 py-1 rounded-md cursor-pointer bg-greylish bg-opacity-20 flex items-center justify-center xl:space-x-5" filename={"remox_transactions.csv"} data={transactions.map(w => ({
+                        'Sent From:': w.node.celoTransfer.edges[0].node.fromAddressHash,
+                        'Amount:': parseFloat(Web3.utils.fromWei(w.node.celoTransfer.edges[0].node.value, 'ether')).toFixed(4) + ` ${Coins[Object.entries(TransactionFeeTokenName).find(s => s[0] === w.node.feeToken)![1]].name}`,
+                        'To:': w.node.celoTransfer.edges[0].node.toAddressHash,
+                        'Date': dateFormat(new Date(w.node.timestamp), "mediumDate")
+                    }))}>
+                        <div className={'hidden xl:block'}>Export</div>
+                        <img src="/icons/downloadicon.svg" alt="" />
+                    </CSVLink>}
+
                 </div>
                 <div>
                     {!isLoading && transactions ? transactions.slice(0, take).map((transaction, index) => {
@@ -55,10 +65,11 @@ const Transactions = () => {
                         const coinName = coin.name;
                         const direction = tx.celoTransfer.edges[0].node.fromAddressHash.trim().toLowerCase() === storage!.accountAddress.trim().toLowerCase() ? TransactionDirection.Out : TransactionDirection.In
                         const date = dateFormat(new Date(tx.timestamp), "mediumDate")
-                        const amountUSD = (currencies[coin.value] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2))
+                        const amountUSD = (currencies[coin.lowerName] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2))
                         const surplus = direction === TransactionDirection.In ? '+' : '-'
+                        const type = direction === TransactionDirection.In ? TransactionType.IncomingPayment : TransactionType.QuickTransfer
 
-                        return <TransactionItem key={generate()} hash={tx.celoTransfer.edges[0].node.transactionHash.toString()} amountCoin={`${amount} ${coinName}`} type={TransactionType.PaySomeone} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} expand={true} />
+                        return <TransactionItem key={generate()} hash={tx.celoTransfer.edges[0].node.transactionHash.toString()} amountCoin={`${amount} ${coinName}`} type={type} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} expand={true} />
                     }) : <div className="text-center"><ClipLoader /></div>}
                 </div>
                 {transactions && take < 100 && take < transactions.length && <div className="flex justify-center py-4">

@@ -55,4 +55,4 @@ export const teamMemberAPI = createApi({
 })
 
 
-export const { useAddMemberMutation, useGetMemberQuery, useGetMembersQuery, useLazyGetMembersQuery, useDeleteMemberMutation, useUpdateMemberMutation } = teamMemberAPI
+export const { useAddMemberMutation, useLazyGetMemberQuery, useGetMembersQuery, useLazyGetMembersQuery, useDeleteMemberMutation, useUpdateMemberMutation } = teamMemberAPI

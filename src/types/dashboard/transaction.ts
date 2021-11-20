@@ -1,6 +1,8 @@
 export enum TransactionType {
     PaySomeone,
-    MassPayout
+    MassPayout,
+    QuickTransfer,
+    IncomingPayment
 }
 
 export enum TransactionDirection {

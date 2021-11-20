@@ -12,7 +12,7 @@ const Home = () => {
         <section className="flex justify-center items-center w-full h-screen">
             <div className="w-[800px] h-[600px] bg-[#eeeeee] bg-opacity-40 flex flex-col justify-center items-center gap-14">
                 <div className="w-[400px] flex flex-col items-center justify-center gap-10">
-                    <img src="/logo.png" alt="" />
+                    <img src="/logo.png" alt="" className="w-full"/>
                     <span className="font-light text-greylish">All-in-One Tool For Crypto Treasury Management</span>
                 </div>
                 <div className="flex flex-col gap-5">

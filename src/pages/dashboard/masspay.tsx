@@ -7,11 +7,11 @@ import Success from "../../components/success";
 import Error from "../../components/error";
 import { DropDownItem } from "../../types/dropdown";
 import { Member, MultipleTransactionData } from "../../types/sdk";
-import { useGetBalanceQuery, useLazyGetTeamsWithMembersQuery, useSendCeloMutation, useSendCUSDMutation, useSendMultipleTransactionsMutation } from "../../redux/api";
+import { useGetBalanceQuery, useLazyGetTeamsWithMembersQuery, useSendCeloMutation, useSendStableTokenMutation, useSendMultipleTransactionsMutation } from "../../redux/api";
 import { useSelector } from "react-redux";
 import { selectStorage } from "../../redux/reducers/storage";
 import TeamInput from "../../components/pay/teaminput";
-import { CoinsName, CoinsURL } from "../../types/coins";
+import { CoinsName, CoinsURL, StableTokens } from "../../types/coins";
 import { useAppSelector } from "../../redux/hooks";
 
 
@@ -22,7 +22,7 @@ const MassPay = () => {
 
     const { data } = useGetBalanceQuery()
     const [sendCelo] = useSendCeloMutation()
-    const [sendCusd] = useSendCUSDMutation()
+    const [sendStableToken] = useSendStableTokenMutation()
     const [sendMultiple] = useSendMultipleTransactionsMutation()
     const [getTeams, { data: teams, error: teamsError, isLoading: teamLoading }] = useLazyGetTeamsWithMembersQuery()
 
@@ -78,7 +78,7 @@ const MassPay = () => {
                 result.push({
                     toAddress: mems[index].address,
                     amount: mems[index].amount,
-                    walletType: mems[index].currency
+                    tokenType: mems[index].currency
                 })
             }
         }
@@ -86,28 +86,28 @@ const MassPay = () => {
         setIsPaying(true)
 
         try {
-            if (result.length === 1 && selectedWallet && selectedWallet.name) {
-                if (selectedWallet!.name.toLowerCase() === "celo") {
+            if (result.length === 1) {
+                if (result[0].tokenType === CoinsName.CELO) {
                     await sendCelo({
                         toAddress: result[0].toAddress,
                         amount: result[0].amount,
                         phrase: storage!.encryptedPhrase
                     }).unwrap
 
-                } else if (selectedWallet.name.toLowerCase() === "cusd") {
-
-                    await sendCusd({
+                } else {
+                    await sendStableToken({
                         toAddress: result[0].toAddress,
                         amount: result[0].amount,
-                        phrase: storage!.encryptedPhrase
+                        phrase: storage!.encryptedPhrase,
+                        stableTokenType: StableTokens[(result[0].tokenType as StableTokens)]
                     }).unwrap()
                 }
             }
-            else if (result.length > 1) {
+            else {
                 const arr: Array<MultipleTransactionData> = result.map(w => ({
                     toAddress: w.toAddress,
                     amount: w.amount,
-                    walletType: w.walletType
+                    tokenType: w.tokenType
                 }))
 
                 await sendMultiple({
@@ -125,51 +125,57 @@ const MassPay = () => {
         setIsPaying(false);
     }
 
-    return <div className="px-32">
+    return <div>
         <form onSubmit={Submit}>
             <div className="flex flex-col items-center justify-center min-h-screen">
-                <div className="text-left w-full">
-                    <div>Mass Payout</div>
-                </div>
-                <div className="min-w-[85vw] min-h-[75vh] h-auto shadow-xl border flex flex-col gap-10 py-10">
-                    {!teamLoading && teams && teams.teams.length === 0 ? <div className="flex justify-center">No Team Yet. Please, first, create a team</div> : <><div className="flex flex-col pl-12 pr-[25%] gap-10">
-                        <div className="flex flex-col">
-                            <span className="text-left">Paying From</span>
-                            <div className="grid grid-cols-4 gap-x-10">
-                                {!(teams && selectedTeam) ? <ClipLoader /> : <Dropdown className="h-full" disableAddressDisplay={true} onSelect={setSelectedTeam} nameActivation={true} selected={selectedTeam} list={teams.teams.map(w => ({ name: w.title, address: w.id }))} />}
-                                {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={[{ name: "Celo", type: 'celo', amount: `${data.celoBalance}`, value: CoinsName.CELO, coinUrl: CoinsURL.CELO }, { name: "cUSD", type: 'cUsd', amount: `${data.cUSDBalance}`, value: CoinsName.cUSD, coinUrl: CoinsURL.cUSD }]} />}
-                            </div>
-                        </div>
-                        <div className="flex flex-col">
-                            <div className="flex justify-between py-4 items-center">
-                                <span className="text-left">Team Details</span>
-                                <div className="flex space-x-2 items-center">
-                                    <input type="checkbox" className="relative cursor-pointer w-[20px] h-[20px] checked:before:absolute checked:before:w-full checked:before:h-full checked:before:bg-primary checked:before:block" onChange={(e) => {
-                                        if (e.target.checked) setSelectedId(resMember.current.map(w => w.id))
-                                        else setSelectedId([])
-                                    }} />
-                                    <button type="button">
-                                        Select All
-                                    </button>
+                <div className="w-[85vw] min-h-[75vh]">
+                    <div className="w-full">
+                        <div>Mass Payout</div>
+                    </div>
+                    <div className=" h-auto shadow-xl border flex flex-col gap-10 py-10">
+                        {!teamLoading && teams && teams.teams.length === 0 ? <div className="flex justify-center">No Team Yet. Please, first, create a team</div> : <><div className="flex flex-col pl-12 pr-[25%] gap-10">
+                            <div className="flex flex-col space-y-3">
+                                <span className="text-left font-semibold">Paying From</span>
+                                <div className="grid grid-cols-4 gap-x-10">
+                                    {!(teams && selectedTeam) ? <ClipLoader /> : <Dropdown className="h-full" disableAddressDisplay={true} onSelect={setSelectedTeam} nameActivation={true} selected={selectedTeam} list={teams.teams.map(w => ({ name: w.title, address: w.id }))} />}
+                                    {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={[{ name: "Celo", type: 'celo', amount: `${data.celoBalance}`, value: CoinsName.CELO, coinUrl: CoinsURL.CELO }, { name: "cUSD", type: 'cUsd', amount: `${data.cUSDBalance}`, value: CoinsName.cUSD, coinUrl: CoinsURL.cUSD }]} />}
                                 </div>
                             </div>
-                            <div className="grid grid-cols-[25%,45%,25%,5%] gap-5">
-                                {teams && resMember && selectedTeam && selectedTeam.address && members && members.length > 0 ? resMember.current.map((w, i) => <TeamInput generalWallet={selectedWallet!} setGeneralWallet={setSelectedWallet} selectedId={selectedId} setSelectedId={setSelectedId} key={generate()} index={i} {...w} members={resMember} />) : 'No Member Yet'}
+                            <div className="flex flex-col">
+                                <div className="flex justify-between py-4 items-center">
+                                    <span className="text-left font-semibold">Team Details</span>
+                                    <div className="flex space-x-2 items-center">
+                                        <input type="checkbox" className="relative cursor-pointer w-[20px] h-[20px] checked:before:absolute checked:before:w-full checked:before:h-full checked:before:bg-primary checked:before:block" onChange={(e) => {
+                                            if (e.target.checked) setSelectedId(resMember.current.map(w => w.id))
+                                            else setSelectedId([])
+                                        }} />
+                                        <button type="button">
+                                            Select All
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-[25%,45%,25%,5%] gap-5">
+                                    <div className="font-semibold">Name</div>
+                                    <div className="font-semibold">Address</div>
+                                    <div className="font-semibold">Disbursement</div>
+                                    <div></div>
+                                    {teams && resMember && selectedTeam && selectedTeam.address && members && members.length > 0 ? resMember.current.map((w, i) => <TeamInput generalWallet={selectedWallet!} setGeneralWallet={setSelectedWallet} selectedId={selectedId} setSelectedId={setSelectedId} key={generate()} index={i} {...w} members={resMember} />) : 'No Member Yet'}
+                                </div>
+                            </div>
+                            <div className="flex flex-col">
+                                <span className="text-left">Description (Optional)</span>
+                                <div className="grid grid-cols-1">
+                                    <textarea className="border-2 rounded-xl" name="description" id="" cols={30} rows={5}></textarea>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col">
-                            <span className="text-left">Description (Optional)</span>
-                            <div className="grid grid-cols-1">
-                                <textarea className="border-2 rounded-xl" name="description" id="" cols={30} rows={5}></textarea>
-                            </div>
-                        </div>
+                            <div className="flex justify-center">
+                                <div className="grid grid-cols-2 w-[400px] justify-center gap-5">
+                                    <button type="button" className="border-2 border-primary px-3 py-2 text-primary rounded-lg" onClick={() => router.goBack()}>Close</button>
+                                    <button type="submit" className="bg-primary px-3 py-2 text-white flex items-center justify-center rounded-lg">{isPaying ? <ClipLoader /> : 'Pay'}</button>
+                                </div>
+                            </div> </>}
                     </div>
-                        <div className="flex justify-center">
-                            <div className="grid grid-cols-2 w-[400px] justify-center gap-5">
-                                <button type="button" className="border-2 border-primary px-3 py-2 text-primary" onClick={() => router.goBack()}>Close</button>
-                                <button type="submit" className="bg-primary px-3 py-2 text-white flex items-center justify-center">{isPaying ? <ClipLoader /> : 'Pay'}</button>
-                            </div>
-                        </div> </>}
                 </div>
             </div>
         </form>

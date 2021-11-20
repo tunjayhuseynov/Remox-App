@@ -35,7 +35,7 @@ const Visitcard = ({ name, address }: { name: string, address: string }) => <div
     }, '')}</p>
 </div>
 
-const Li = ({ children }: { children: Array<any> }) => <li className="flex gap-2 text-left border px-3 py-2 bg-white hover:text-primary hover:border-b-primary cursor-pointer first:rounded-t-xl last:rounded-b-xl">{children}</li>
+const Li = ({ children, link }: { children: any, link: string }) => <li className="text-left border px-3 py-2 bg-white hover:text-primary hover:border-b-primary cursor-pointer first:rounded-t-xl last:rounded-b-xl"><Link to={link} className='flex gap-2'>{children}</Link></li>
 
 const NavbarDropdown = () => {
     const [isOpen, setOpen] = useState(false)
@@ -58,13 +58,14 @@ const NavbarDropdown = () => {
         </button>
         {isOpen && <div ref={divRef} className="absolute w-[150%] rounded-2xl -left-1/4  -bottom-1 translate-y-full shadow-xl">
             <ul>
-                <Link to="/dashboard/pay"><Li><PaySVG /> Pay Someone</Li></Link>
-                <Link to="/dashboard/masspayout"><Li><MassPayoutSVG />Mass Payout</Li></Link>
-                <Li><RequestMoneySVG /> Request Money</Li>
-                <Li><FundSVG /> Add Funds</Li>
+                <Li link={'/dashboard/pay'}><PaySVG /> Pay Someone</Li>
+                <Li link="/dashboard/masspayout"><MassPayoutSVG />Mass Payout</Li>
+                <Li link=''><RequestMoneySVG /> Request Money</Li>
+                <Li link=''><FundSVG /> Add Funds</Li>
             </ul>
-        </div>}
-    </div>
+        </div>
+        }
+    </div >
 }
 
 const PaySVG = () => <img src='/icons/senticon.svg' alt="" />

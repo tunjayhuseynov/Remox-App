@@ -1,5 +1,5 @@
 import React, { SyntheticEvent, useEffect, useRef, useState } from "react";
-import { Coins, CoinsName, CoinsURL, TransactionFeeTokenName } from "../../../types/coins";
+import { AltCoins, Coins, CoinsName, CoinsURL, TransactionFeeTokenName } from "../../../types/coins";
 import { DropDownItem } from "../../../types/dropdown";
 import { TeamInfo } from "../../../types/sdk/Team/GetTeams";
 import Dropdown from "../../dropdown";
@@ -51,7 +51,7 @@ const AddMember = ({ onDisable }: { onDisable: React.Dispatch<boolean> }) => {
 
 
         if (firstNameValue && lastNameValue && walletAddressValue && amountValue) {
-            if (!Object.values(Coins).includes(selectedWallet as { name: string, coinUrl: CoinsURL, value: CoinsName, feeName: TransactionFeeTokenName })) {
+            if (!Object.values(Coins).includes(selectedWallet as AltCoins)) {
                 alert("Please, choose a wallet")
                 return
             }

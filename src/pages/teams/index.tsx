@@ -38,7 +38,7 @@ const Teams = () => {
             maxTeamCount.current = result.data.total;
             if (skipRef.current !== 0) {
                 setTeams([...teams, ...result.data.teams])
-            }else{
+            } else {
                 setTeams(result.data.teams)
             }
             dispatch(changeSuccess(false))
@@ -46,8 +46,8 @@ const Teams = () => {
     }, [result.data])
 
     useEffect(() => {
-        skipRef.current = skipCount
-        trigger({ take: teamCount, skip: skipCount })
+            skipRef.current = skipCount
+            trigger({ take: teamCount, skip: skipCount })
     }, [skipCount])
 
 
@@ -55,24 +55,9 @@ const Teams = () => {
         if (isSuccess) {
             //refetch()
             skipRef.current = 0;
-            trigger({ take: teams.length, skip: 0 })
+            trigger({ take: teams.length < teamCount ? teamCount : teams.length, skip: skipRef.current })
         }
     }, [isSuccess])
-
-    // useEffect(() => {
-    //     if (result && result.data?.teams && teams.length === 0) {
-    //         setTeams(result.data?.teams)
-    //     }
-    // }, [result.data])
-
-    // useEffect(() => {
-    //     if (result && result.data?.teams) {
-    //         if (teams.length > 0 && result.data?.teams.length > 0) {
-    //             setTeams([...teams, ...result.data?.teams])
-    //         }
-    //     }
-    // }, [skipCount])
-
 
     return <div>
         <div className="flex justify-between pb-5">
