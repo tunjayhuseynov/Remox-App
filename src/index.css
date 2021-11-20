@@ -10,3 +10,9 @@ body{
 .color-blue{
     color: blue;
 }
+
+img,
+video {
+  max-width: none;
+  height: auto;
+}

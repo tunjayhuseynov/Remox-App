@@ -19,7 +19,8 @@ import Transactions from './pages/transactions/transactions'
 import { IStorage, selectStorage } from './redux/reducers/storage';
 import { selectUnlock } from './redux/reducers/unlock';
 import { useAppSelector } from './redux/hooks';
-
+import Details from './pages/transactions/details';
+import MassPay from './pages/dashboard/masspay'
 
 function App(): JSX.Element {
   const storage = useAppSelector(selectStorage)
@@ -39,7 +40,7 @@ function App(): JSX.Element {
   );
 }
 
-const CustomRouter = ({ unlock, data }: { unlock: boolean, data: IStorage | null}) => {
+const CustomRouter = ({ unlock, data }: { unlock: boolean, data: IStorage | null }) => {
   const router = useHistory();
   const location = useLocation();
 
@@ -49,7 +50,7 @@ const CustomRouter = ({ unlock, data }: { unlock: boolean, data: IStorage | null
 
   const unlockChecking = (element: JSX.Element | Array<JSX.Element>) => {
     if (unlock) return element
-    if((location.pathname === '/create' || location.pathname === '/import' || location.pathname === '/') && !data?.accountAddress) return element
+    if (!location.pathname.includes("/dashboard") && !data?.accountAddress) return element
 
     return <Redirect
       to={{
@@ -78,8 +79,10 @@ const AuthRouter = ({ data, unlockChecking }: { data: any, unlockChecking: Funct
   return <>
     <Route path={'/dashboard'} exact render={() => unlockChecking(<Dashboard ><Main /></Dashboard>)} />
     <Route path={'/dashboard/pay'} exact render={() => unlockChecking(<Pay />)} />
+    <Route path={'/dashboard/masspayout'} exact render={() => unlockChecking(<MassPay />)} />
     <Route path={'/dashboard/teams'} exact render={() => unlockChecking(<Dashboard><Teams /></Dashboard>)} />
     <Route path={'/dashboard/transactions'} exact render={() => unlockChecking(<Dashboard><Transactions /></Dashboard>)} />
+    <Route path={'/dashboard/transactions/:id'} exact render={() => unlockChecking(<Dashboard><Details /></Dashboard>)} />
   </>
 }
 

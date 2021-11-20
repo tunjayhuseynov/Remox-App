@@ -21,7 +21,9 @@ const EditTeam = (props: TeamInfoWithMembers & { onCurrentModal: Dispatch<boolea
             <input type="text" defaultValue={props.title} onChange={(e) => setInput(e.target.value)} className="text-center px-3 rounded-md py-2 outline-none border-2 border-black border-opacity-50" required />
         </div>
         <div className="grid grid-cols-2 self-end gap-x-5">
-            <button className="w-full py-3 border border-primary rounded-xl text-primary">
+            <button className="w-full py-3 border border-primary rounded-xl text-primary" onClick={() =>{
+                props.onCurrentModal(false)
+            }}>
                 Close
             </button>
             <button className="w-full px-4 py-3 bg-primary text-white rounded-xl" onClick={async (e) => {

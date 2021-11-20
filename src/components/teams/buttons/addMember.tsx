@@ -6,19 +6,35 @@ import Dropdown from "../../dropdown";
 import { ClipLoader } from "react-spinners";
 import { useAppDispatch } from "../../../redux/hooks"
 import { changeSuccess, changeError } from '../../../redux/reducers/notificationSlice'
-import { useGetTeamsQuery } from "../../../redux/api/team";
+import { useLazyGetTeamsQuery } from "../../../redux/api/team";
 import { useAddMemberMutation } from "../../../redux/api/teamMember";
 
 
 const AddMember = ({ onDisable }: { onDisable: React.Dispatch<boolean> }) => {
 
-    const { data, error, isLoading } = useGetTeamsQuery({ take: Number.MAX_SAFE_INTEGER })
+    const [triggerTeams, { data, error, isLoading }] = useLazyGetTeamsQuery()
     const [addMember, { isLoading: addMemberLoading, error: memberError }] = useAddMemberMutation();
 
-    const [selected, setSelected] = useState<DropDownItem>(data?.teams && data.teams.length > 0 ? { name: "Select Team", coinUrl: CoinsURL.None } : { name: "No Team", coinUrl: CoinsURL.None })
+    const [selected, setSelected] = useState<DropDownItem>({ name: "No Team", coinUrl: CoinsURL.None })
     const [selectedWallet, setSelectedWallet] = useState<DropDownItem>(Coins[CoinsName.CELO]);
 
     const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        triggerTeams({ take: Number.MAX_SAFE_INTEGER })
+    }, [])
+
+    useEffect(() => {
+        if (!data || (data && data.teams.length === 0)) {
+            setSelected({ name: "No Team", coinUrl: CoinsURL.None })
+        }
+    })
+
+    useEffect(() => {
+        if (data && data.teams && data.teams.length > 0) {
+            setSelected({ name: "Select Team", coinUrl: CoinsURL.None })
+        }
+    }, [data])
 
 
     const Submit = async (e: SyntheticEvent<HTMLFormElement>) => {

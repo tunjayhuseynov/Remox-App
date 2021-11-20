@@ -17,8 +17,8 @@ const Teams = () => {
 
     const [teamCount] = useState(3)
     const [skipCount, setSkipCount] = useState(0)
+    const skipRef = useRef(0)
 
-    const { data, isLoading, refetch } = useGetTeamsWithMembersQuery({ take: teamCount, skip: skipCount })
     const [trigger, result] = useLazyGetTeamsWithMembersQuery();
 
 
@@ -34,24 +34,44 @@ const Teams = () => {
     const maxTeamCount = useRef(0)
 
     useEffect(() => {
-        if (data) {
-            setTeams([...teams, ...data.teams]);
-            maxTeamCount.current = data.total
+        if (result.data) {
+            maxTeamCount.current = result.data.total;
+            if (skipRef.current !== 0) {
+                setTeams([...teams, ...result.data.teams])
+            }else{
+                setTeams(result.data.teams)
+            }
+            dispatch(changeSuccess(false))
         }
-    }, [data])
+    }, [result.data])
+
+    useEffect(() => {
+        skipRef.current = skipCount
+        trigger({ take: teamCount, skip: skipCount })
+    }, [skipCount])
+
 
     useEffect(() => {
         if (isSuccess) {
-            refetch()
+            //refetch()
+            skipRef.current = 0;
             trigger({ take: teams.length, skip: 0 })
         }
     }, [isSuccess])
 
-    useEffect(() => {
-        if (result.data?.teams) {
-            setTeams(result.data?.teams)
-        }
-    }, [result.data])
+    // useEffect(() => {
+    //     if (result && result.data?.teams && teams.length === 0) {
+    //         setTeams(result.data?.teams)
+    //     }
+    // }, [result.data])
+
+    // useEffect(() => {
+    //     if (result && result.data?.teams) {
+    //         if (teams.length > 0 && result.data?.teams.length > 0) {
+    //             setTeams([...teams, ...result.data?.teams])
+    //         }
+    //     }
+    // }, [skipCount])
 
 
     return <div>
@@ -75,15 +95,14 @@ const Teams = () => {
                 {teams.map(w => w && w.teamMembers && w.teamMembers.length > 0 ? <Fragment key={generate()}><TeamContainer {...w} /></Fragment> : undefined)}
                 {teams.map(w => w && w.teamMembers && w.teamMembers.length === 0 ? <Fragment key={generate()}><TeamContainer {...w} /></Fragment> : undefined)}
 
-                {(isLoading || result.isLoading) && <div className="flex justify-center py-10"><ClipLoader /></div>}
+                {(result.isLoading || result.isFetching) && <div className="flex justify-center py-10"><ClipLoader /></div>}
             </div>
         </div>
-        {teams.length < maxTeamCount.current && <div className="flex justify-center py-4">
+        {(!result.isLoading && !result.isFetching) && (teams.length ?? 0) < maxTeamCount.current && <div className="flex justify-center py-4">
             <button className="text-primary px-5 py-3 rounded-xl border border-primary" onClick={() => {
-                if (maxTeamCount.current - teams.length < teamCount) {
+                if (maxTeamCount.current - (teams.length ?? 0) < teamCount) {
                     setSkipCount(maxTeamCount.current - (maxTeamCount.current - teams.length))
                 } else {
-                    console.log(teams.length)
                     setSkipCount(teams.length)
                 }
             }}>

@@ -1,8 +1,8 @@
+import { Link } from "react-router-dom";
 import { TransactionType, TransactionDirection, TransactionStatus } from "../types/dashboard/transaction"
 
-const TransactionItem = ({ type, direction, date, amountUSD, status, amountCoin, expand = false }: { type: TransactionType, direction: TransactionDirection, date: string, amountUSD: string, amountCoin: string, status: TransactionStatus, expand?: boolean }) => {
-    console.log(direction)
-    return <div className={`grid ${expand ? 'grid-cols-[1fr,1fr,1fr,0.3fr] px-5' : 'grid-cols-[1.5fr,1fr,1fr]'} min-h-[115px] py-6 border-b border-black pr-10`}>
+const TransactionItem = ({ type, direction, date, amountUSD, status, amountCoin, hash, expand = false }: { hash: string, type: TransactionType, direction: TransactionDirection, date: string, amountUSD: string, amountCoin: string, status: TransactionStatus, expand?: boolean }) => {
+    return <div className={`grid ${expand ? 'grid-cols-[1fr,1fr,1fr,0.3fr] px-5 pr-10' : 'grid-cols-[1.5fr,1fr,1fr]'} min-h-[115px] py-6 border-b border-black `}>
         <div className="flex space-x-5">
             <div className="flex items-center justify-center">
                 <div className="bg-greylish bg-opacity-10 w-[40px] h-[40px] flex items-center justify-center rounded-full">
@@ -18,7 +18,7 @@ const TransactionItem = ({ type, direction, date, amountUSD, status, amountCoin,
                 </div>
             </div>
         </div>
-        <div className="flex flex-col justify-between items-left text-greylish">
+        <div className={`flex flex-col justify-between ${expand ? 'items-left':'items-center'} text-greylish`}>
             <div>
                 {amountCoin}
             </div>
@@ -26,12 +26,12 @@ const TransactionItem = ({ type, direction, date, amountUSD, status, amountCoin,
                 {amountUSD}
             </div>
         </div>
-        <div className="flex items-center">
+        <div className={`flex items-center ${expand? 'justify-start':'justify-end'}`}>
             {TransactionStatus.Complated === status ? <span className="text-green-400">Complated</span> : null}
         </div>
         {expand &&
             <div className="flex flex-col justify-center cursor-pointer text-blue-400 items-end">
-                View
+                <Link to={`/dashboard/transactions/${hash}`}>View</Link>
             </div>
         }
     </div>

@@ -23,9 +23,18 @@ const Transactions = () => {
         trigger({ address: storage!.accountAddress, take: 100 })
         const interval = setInterval(() => {
             trigger({ address: storage!.accountAddress, take: 100 })
-        }, 3000)
+        }, 15000)
         return () => clearInterval(interval)
     }, [])
+
+    useEffect(() => {
+        if (transactions) {
+            transactions.reduce((acc, cur) => {
+                 
+                return acc;
+            },[])
+        }
+    }, [transactions])
 
     return <>
         <div>
@@ -39,6 +48,7 @@ const Transactions = () => {
                 <div>
                     {!isLoading && transactions ? transactions.slice(0, take).map((transaction, index) => {
                         const tx = transaction.node;
+                        console.log(tx)
 
                         const amount = parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2)
                         const coin = Coins[Object.entries(TransactionFeeTokenName).find(w => w[0] === tx.feeToken)![1]];
@@ -48,7 +58,7 @@ const Transactions = () => {
                         const amountUSD = (currencies[coin.value] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2))
                         const surplus = direction === TransactionDirection.In ? '+' : '-'
 
-                        return <TransactionItem key={generate()} amountCoin={`${amount} ${coinName}`} type={TransactionType.PaySomeone} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} expand={true} />
+                        return <TransactionItem key={generate()} hash={tx.celoTransfer.edges[0].node.transactionHash.toString()} amountCoin={`${amount} ${coinName}`} type={TransactionType.PaySomeone} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} expand={true} />
                     }) : <div className="text-center"><ClipLoader /></div>}
                 </div>
                 {transactions && take < 100 && take < transactions.length && <div className="flex justify-center py-4">

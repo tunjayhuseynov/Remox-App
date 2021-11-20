@@ -30,3 +30,4 @@ interface DropDownOnlyCoin extends BaseDropDown {
     amount?: string,
     coinUrl: CoinsURL
 }
+

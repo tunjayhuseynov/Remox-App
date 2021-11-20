@@ -5,7 +5,8 @@ export interface UpdateMember {
     name: string,
     address: string,
     currency: CoinsName,
-    amount: string
+    amount: string,
+    teamId: string
 }
 
 export interface UpdateMemberResponse {
@@ -13,5 +14,6 @@ export interface UpdateMemberResponse {
     name: string,
     address: string,
     currency: CoinsName,
-    amount: string
+    amount: string,
+    teamId: string
 }

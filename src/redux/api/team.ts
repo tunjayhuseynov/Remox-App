@@ -56,4 +56,4 @@ export const teamAPI = createApi({
 })
 
 
-export const { useCreateTeamMutation, useGetTeamsQuery, useLazyGetTeamsWithMembersQuery ,useGetTeamsWithMembersQuery, useDeleteTeamMutation, useUpdateTeamMutation } = teamAPI
+export const { useCreateTeamMutation, useLazyGetTeamsQuery, useLazyGetTeamsWithMembersQuery ,useGetTeamsWithMembersQuery, useDeleteTeamMutation, useUpdateTeamMutation } = teamAPI

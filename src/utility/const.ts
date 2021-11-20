@@ -1,1 +1,1 @@
-export const BaseUrl = "https://remox-backend.herokuapp.com"
+export const BaseUrl = "http://localhost:3000"

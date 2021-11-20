@@ -1,4 +1,3 @@
-import Dropdown from "../../components/dropdown";
 import Siderbarlist from '../../components/dashboard/siderbarlist'
 
 const Sidebar = () => {

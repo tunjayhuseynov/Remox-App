@@ -1,6 +1,4 @@
-1. LocalSotrage Must be Centrilized ++++
-2. Currencies must be Centrilized
-3. Loader must be Centerlizied
-4. Change Loader with Redux Hook
-5. Unlock => redux
-6. Convert Icons image to SVG
+1. Edit Member
+2. Transaction
+3. MassPayout
+4. Automation Payment

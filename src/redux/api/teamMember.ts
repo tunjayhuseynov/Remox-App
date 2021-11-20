@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BaseUrl } from '../../utility/const'
-import { AddMember, AddMemberResponse, GetMemberResponse, GetTeams, GetTeamsResponse, Member, UpdateTeam, UpdateTeamResponse } from '../../types/sdk'
+import { AddMember, AddMemberResponse, GetMemberResponse, GetTeams, GetTeamsResponse, Member, UpdateMember, UpdateMemberResponse, UpdateTeam, UpdateTeamResponse } from '../../types/sdk'
 import { RootState } from '../store';
 
 export const teamMemberAPI = createApi({
@@ -44,7 +44,7 @@ export const teamMemberAPI = createApi({
             })
         }),
 
-        updateMember: builder.mutation<UpdateTeamResponse, UpdateTeam>({
+        updateMember: builder.mutation<UpdateMemberResponse, UpdateMember>({
             query: (data) => ({
                 url: `/team-member`,
                 method: 'PUT',
@@ -55,4 +55,4 @@ export const teamMemberAPI = createApi({
 })
 
 
-export const { useAddMemberMutation, useGetMemberQuery,useGetMembersQuery, useLazyGetMembersQuery, useDeleteMemberMutation, useUpdateMemberMutation } = teamMemberAPI
+export const { useAddMemberMutation, useGetMemberQuery, useGetMembersQuery, useLazyGetMembersQuery, useDeleteMemberMutation, useUpdateMemberMutation } = teamMemberAPI

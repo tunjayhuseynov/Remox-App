@@ -59,7 +59,7 @@ const NavbarDropdown = () => {
         {isOpen && <div ref={divRef} className="absolute w-[150%] rounded-2xl -left-1/4  -bottom-1 translate-y-full shadow-xl">
             <ul>
                 <Link to="/dashboard/pay"><Li><PaySVG /> Pay Someone</Li></Link>
-                <Li><MassPayoutSVG />Mass Payout</Li>
+                <Link to="/dashboard/masspayout"><Li><MassPayoutSVG />Mass Payout</Li></Link>
                 <Li><RequestMoneySVG /> Request Money</Li>
                 <Li><FundSVG /> Add Funds</Li>
             </ul>
