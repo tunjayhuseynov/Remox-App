@@ -10,17 +10,20 @@ import { selectStorage } from '../../redux/reducers/storage';
 const Navbar = () => {
     const storage = useAppSelector(selectStorage)
 
-    return <div className="grid grid-cols-5 gap-12">
+    return <div className="grid grid-cols-3 md:grid-cols-5 gap-12">
+        <div>
+            
+        </div>
         <div className="h-[50px] flex items-center pl-4 lg:pl-14">
             <img src="/logo.png" alt="" width="150" />
         </div>
-        <div className="search col-span-2">
+        <div className="search col-span-2 hidden md:block">
             <div className="w-full h-12 shadow backdrop-blur bg-gray-50 rounded-lg flex items-center pl-3 gap-3">
                 <BsSearch />
                 <input type="text" placeholder={'Search'} className="flex-grow bg-transparent outline-none" />
             </div>
         </div>
-        <div className="actions flex items-center justify-evenly col-span-2">
+        <div className="actions flex items-center justify-evenly md:col-span-2">
             {storage ? <Visitcard name="Remox" address={storage.accountAddress} /> : <ClipLoader />}
             <NavbarDropdown />
             <IoMdNotificationsOutline className="text-2xl" />
@@ -65,7 +68,7 @@ const NavbarDropdown = () => {
             </ul>
         </div>
         }
-    </div >
+    </div>
 }
 
 const PaySVG = () => <img src='/icons/senticon.svg' alt="" />

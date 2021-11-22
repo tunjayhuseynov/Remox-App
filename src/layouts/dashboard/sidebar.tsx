@@ -1,4 +1,4 @@
-import Siderbarlist from '../../components/dashboard/siderbarlist'
+import Siderbarlist from '../../components/dashboard/sidebarlist'
 
 const Sidebar = () => {
 
