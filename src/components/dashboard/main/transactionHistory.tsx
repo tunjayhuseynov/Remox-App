@@ -30,8 +30,9 @@ const TransactionHistory = ({ transactions }: { transactions: BlockScoutNode[] }
                 const date = dateFormat(new Date(tx.timestamp), "mediumDate")
                 const amountUSD = (currencies[coin.lowerName] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2))
                 const surplus = direction === TransactionDirection.In ? '+' : '-'
+                const type = direction === TransactionDirection.In ? TransactionType.IncomingPayment : TransactionType.QuickTransfer
 
-                return <TransactionItem key={generate()} hash={tx.celoTransfer.edges[0].node.transactionHash} amountCoin={`${amount} ${coinName}`} type={TransactionType.PaySomeone} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} />
+                return <TransactionItem key={generate()} hash={tx.celoTransfer.edges[0].node.transactionHash} amountCoin={`${amount} ${coinName}`} type={type} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} />
             })}
         </div>
     </div>

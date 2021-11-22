@@ -15,10 +15,6 @@ const Main = () => {
 
     const { data: transactions, error: transactionError, } = useGetTransactionsQuery({ address: storage!.accountAddress, take: 100 })
 
-    // const [celo, setCelo] = useState<number>()
-    // const [cusd, setCUSD] = useState<number>()
-    // const [ceur, setCEUR] = useState<number>()
-
     const celo = useAppSelector(SelectCelo)
     const cusd = useAppSelector(SelectCusd)
     const ceur = useAppSelector(SelectCeur)
@@ -50,9 +46,6 @@ const Main = () => {
 
             const [celoData, cusdData, ceurData] = w;
 
-            // setCelo(celoData.prices[celoData.prices.length - 1][1])
-            // setCUSD(cusdData.prices[cusdData.prices.length - 1][1])
-            // setCEUR(ceurData.prices[ceurData.prices.length - 1][1])
             dispatch(updateAllCurrencies([
                 celoData.prices[celoData.prices.length - 1][1],
                 cusdData.prices[cusdData.prices.length - 1][1],
@@ -82,7 +75,7 @@ const Main = () => {
     }, [celo, cusd, ceur, storage, data, error])
 
 
-    return <main className="grid grid-cols-2 w-full gap-5">
+    return <main className="grid grid-cols-1 xl:grid-cols-2 w-full gap-5">
         <div className="grid grid-cols-2 gap-8">
             <div className="col-span-2 flex flex-col">
                 <div className="flex justify-between pl-4">

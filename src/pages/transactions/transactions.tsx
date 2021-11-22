@@ -40,19 +40,21 @@ const Transactions = () => {
     return <>
         <div>
             <div className="w-full shadow-custom px-5 pt-4 pb-6 rounded-xl">
-                <div id="header" className="grid grid-cols-[45%,30%,10%,15%] border-b border-black pb-5 pl-5" >
+                <div id="header" className="grid grid-cols-[50%,45%,5%] md:grid-cols-[45%,25%,15%,15%] border-b border-black pb-5 pl-5" >
                     <div className="font-semibold">Recent Transactions</div>
                     <div className="font-semibold">Total Amount</div>
-                    <div className="font-semibold">Status</div>
-                    {transactions && <CSVLink className="font-normal place-self-end px-5 py-1 rounded-md cursor-pointer bg-greylish bg-opacity-20 flex items-center justify-center xl:space-x-5" filename={"remox_transactions.csv"} data={transactions.map(w => ({
-                        'Sent From:': w.node.celoTransfer.edges[0].node.fromAddressHash,
-                        'Amount:': parseFloat(Web3.utils.fromWei(w.node.celoTransfer.edges[0].node.value, 'ether')).toFixed(4) + ` ${Coins[Object.entries(TransactionFeeTokenName).find(s => s[0] === w.node.feeToken)![1]].name}`,
-                        'To:': w.node.celoTransfer.edges[0].node.toAddressHash,
-                        'Date': dateFormat(new Date(w.node.timestamp), "mediumDate")
-                    }))}>
-                        <div className={'hidden xl:block'}>Export</div>
-                        <img src="/icons/downloadicon.svg" alt="" />
-                    </CSVLink>}
+                    <div className="font-semibold hidden md:block">Status</div>
+                    <div className="place-self-end ">
+                        {transactions && <CSVLink className="font-normal px-5 py-1 rounded-md cursor-pointer bg-greylish bg-opacity-20 flex items-center justify-center xl:space-x-5" filename={"remox_transactions.csv"} data={transactions.map(w => ({
+                            'Sent From:': w.node.celoTransfer.edges[0].node.fromAddressHash,
+                            'Amount:': parseFloat(Web3.utils.fromWei(w.node.celoTransfer.edges[0].node.value, 'ether')).toFixed(4) + ` ${Coins[Object.entries(TransactionFeeTokenName).find(s => s[0] === w.node.feeToken)![1]].name}`,
+                            'To:': w.node.celoTransfer.edges[0].node.toAddressHash,
+                            'Date': dateFormat(new Date(w.node.timestamp), "mediumDate")
+                        }))}>
+                            <div className={'hidden xl:block'}>Export</div>
+                            <img src="/icons/downloadicon.svg" alt="" />
+                        </CSVLink>}
+                    </div>
 
                 </div>
                 <div>

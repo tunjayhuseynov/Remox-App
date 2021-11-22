@@ -690,16 +690,8 @@ video {
   grid-column: span 8 / span 8;
 }
 
-.clear-left {
-  clear: left;
-}
-
-.clear-both {
-  clear: both;
-}
-
-.m-0 {
-  margin: 0px;
+.col-span-11 {
+  grid-column: span 11 / span 11;
 }
 
 .mb-6 {
@@ -710,16 +702,12 @@ video {
   margin-right: 0.5rem;
 }
 
-.inline-block {
-  display: inline-block;
-}
-
-.inline {
-  display: inline;
-}
-
 .flex {
   display: flex;
+}
+
+.inline-flex {
+  display: inline-flex;
 }
 
 .grid {
@@ -798,6 +786,26 @@ video {
   height: 27px;
 }
 
+.h-\[\] {
+  height: ;
+}
+
+.h-\[100px\] {
+  height: 100px;
+}
+
+.h-\[30px\] {
+  height: 30px;
+}
+
+.h-\[70px\] {
+  height: 70px;
+}
+
+.h-\[80px\] {
+  height: 80px;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -858,6 +866,10 @@ video {
   width: 120px;
 }
 
+.w-\[85vw\] {
+  width: 85vw;
+}
+
 .w-\[85\%\] {
   width: 85%;
 }
@@ -868,10 +880,6 @@ video {
 
 .w-3\/4 {
   width: 75%;
-}
-
-.w-\[85vw\] {
-  width: 85vw;
 }
 
 .min-w-\[33\%\] {
@@ -928,8 +936,12 @@ video {
   cursor: pointer;
 }
 
-.grid-cols-\[1fr\2c 1fr\2c 1fr\2c 0\.3fr\] {
-  grid-template-columns: 1fr 1fr 1fr 0.3fr;
+.resize-x {
+  resize: horizontal;
+}
+
+.grid-cols-\[45\%\2c 30\%\2c 10\%\2c 15\%\] {
+  grid-template-columns: 45% 30% 10% 15%;
 }
 
 .grid-cols-\[1\.5fr\2c 1fr\2c 1fr\] {
@@ -972,100 +984,64 @@ video {
   grid-template-columns: 80%;
 }
 
-.grid-cols-\[1fr\2c 1\.5fr\2c 1fr\2c 0\.3fr\] {
-  grid-template-columns: 1fr 1.5fr 1fr 0.3fr;
+.grid-cols-\[45\%\2c 25\%\2c 10\%\2c 15\%\] {
+  grid-template-columns: 45% 25% 10% 15%;
 }
 
-.grid-cols-\[1\.5fr\2c 1\.5fr\2c 1fr\2c 0\.3fr\] {
-  grid-template-columns: 1.5fr 1.5fr 1fr 0.3fr;
+.grid-cols-\[45\%\2c 25\%\2c 15\%\2c 15\%\] {
+  grid-template-columns: 45% 25% 15% 15%;
 }
 
-.grid-cols-\[1\.5fr\2c 1\.5fr\2c 0\.5fr\2c 0\.3fr\] {
-  grid-template-columns: 1.5fr 1.5fr 0.5fr 0.3fr;
+.grid-cols-\[\] {
+  grid-template-columns: ;
 }
 
-.grid-cols-\[1\.5fr\2c 1\.5fr\2c 0\.7fr\2c 0\.3fr\] {
-  grid-template-columns: 1.5fr 1.5fr 0.7fr 0.3fr;
+.grid-cols-\[45\%\2c 25\%\2c \] {
+  grid-template-columns: 45% 25% ;
 }
 
-.grid-cols-\[25\%\2c 1fr\2c 1fr\2c 0\.3fr\] {
-  grid-template-columns: 25% 1fr 1fr 0.3fr;
+.grid-cols-\[45\%\2c 25\%\2c 30\%\] {
+  grid-template-columns: 45% 25% 30%;
 }
 
-.grid-cols-\[25\%\2c 25\%\2c 1fr\2c 0\.3fr\] {
-  grid-template-columns: 25% 25% 1fr 0.3fr;
+.grid-cols-\[45\%\2c 25\%\2c 5\%\] {
+  grid-template-columns: 45% 25% 5%;
 }
 
-.grid-cols-\[25\%\2c 25\%\2c \2c 0\.3fr\] {
-  grid-template-columns: 25% 25% 0.3fr;
+.grid-cols-\[70\%\2c 25\%\2c 5\%\] {
+  grid-template-columns: 70% 25% 5%;
 }
 
-.grid-cols-\[25\%\2c 25\%\2c 25\%\2c 0\.3fr\] {
-  grid-template-columns: 25% 25% 25% 0.3fr;
+.grid-cols-\[60\%\2c 25\%\2c 5\%\] {
+  grid-template-columns: 60% 25% 5%;
 }
 
-.grid-cols-\[25\%\2c 25\%\2c 25\%\2c 10\%\] {
-  grid-template-columns: 25% 25% 25% 10%;
+.grid-cols-\[60\%\2c 35\%\2c 5\%\] {
+  grid-template-columns: 60% 35% 5%;
 }
 
-.grid-cols-\[25\%\2c 35\%\2c 25\%\2c 10\%\] {
-  grid-template-columns: 25% 35% 25% 10%;
+.grid-cols-\[50\%\2c 35\%\2c 5\%\] {
+  grid-template-columns: 50% 35% 5%;
 }
 
-.grid-cols-\[25\%\2c 35\%\2c 25\%\2c 15\%\] {
-  grid-template-columns: 25% 35% 25% 15%;
+.grid-cols-\[50\%\2c 45\%\2c 5\%\] {
+  grid-template-columns: 50% 45% 5%;
 }
 
-.grid-cols-\[35\%\2c 35\%\2c 25\%\2c 15\%\] {
-  grid-template-columns: 35% 35% 25% 15%;
+.grid-cols-\[20\%\2c 20\%\2c 1fr\] {
+  grid-template-columns: 20% 20% 1fr;
 }
 
-.grid-cols-\[35\%\2c 35\%\2c 15\%\2c 15\%\] {
-  grid-template-columns: 35% 35% 15% 15%;
+.grid-cols-\[30\%\2c 30\%\2c 1fr\] {
+  grid-template-columns: 30% 30% 1fr;
 }
 
-.grid-cols-\[35\%\2c 35\%\2c 15\%\2c 5\%\] {
-  grid-template-columns: 35% 35% 15% 5%;
+.grid-cols-\[20\%\2c 30\%\2c 1fr\] {
+  grid-template-columns: 20% 30% 1fr;
 }
 
-.grid-cols-\[45\%\2c 35\%\2c 15\%\2c 5\%\] {
-  grid-template-columns: 45% 35% 15% 5%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 15\%\2c 5\%\] {
-  grid-template-columns: 45% 30% 15% 5%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 20\%\2c 5\%\] {
-  grid-template-columns: 45% 30% 20% 5%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c \%\2c 5\%\] {
-  grid-template-columns: 45% 30% % 5%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 5\%\2c 5\%\] {
-  grid-template-columns: 45% 30% 5% 5%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 5\%\2c 20\%\] {
-  grid-template-columns: 45% 30% 5% 20%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 5\%\2c 10\%\] {
-  grid-template-columns: 45% 30% 5% 10%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 10\%\2c 10\%\] {
-  grid-template-columns: 45% 30% 10% 10%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 10\%\2c 1\%\] {
-  grid-template-columns: 45% 30% 10% 1%;
-}
-
-.grid-cols-\[45\%\2c 30\%\2c 10\%\2c 15\%\] {
-  grid-template-columns: 45% 30% 10% 15%;
+.grid-cols-\[0\%\2c 30\%\2c 1fr\] {
+  grid-template-columns: 0% 30% 1fr;
 }
 
 .grid-rows-\[25\%\2c 25\%\2c 50\%\] {
@@ -1144,6 +1120,10 @@ video {
   gap: 4rem;
 }
 
+.gap-1 {
+  gap: 0.25rem;
+}
+
 .gap-x-24 {
   column-gap: 6rem;
 }
@@ -1192,6 +1172,12 @@ video {
   margin-left: calc(0.25rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
+.space-y-3 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+}
+
 .space-y-8 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
@@ -1222,12 +1208,6 @@ video {
   margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
 }
 
-.space-y-3 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
-}
-
 .place-self-end {
   place-self: end;
 }
@@ -1240,8 +1220,30 @@ video {
   align-self: flex-end;
 }
 
+.self-center {
+  align-self: center;
+}
+
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.overflow-ellipsis {
+  text-overflow: ellipsis;
+}
+
+.overflow-clip {
+  text-overflow: clip;
 }
 
 .whitespace-nowrap {
@@ -1270,10 +1272,6 @@ video {
 
 .rounded-2xl {
   border-radius: 1rem;
-}
-
-.rounded {
-  border-radius: 0.25rem;
 }
 
 .rounded-b-none {
@@ -1499,8 +1497,12 @@ video {
   padding-right: 3rem;
 }
 
-.pr-10 {
-  padding-right: 2.5rem;
+.pl-5 {
+  padding-left: 1.25rem;
+}
+
+.pr-5 {
+  padding-right: 1.25rem;
 }
 
 .pt-8 {
@@ -1575,10 +1577,6 @@ video {
   padding-left: 0.25rem;
 }
 
-.pr-5 {
-  padding-right: 1.25rem;
-}
-
 .pt-5 {
   padding-top: 1.25rem;
 }
@@ -1597,14 +1595,6 @@ video {
 
 .pt-10 {
   padding-top: 2.5rem;
-}
-
-.pl-5 {
-  padding-left: 1.25rem;
-}
-
-.pl-6 {
-  padding-left: 1.5rem;
 }
 
 .text-left {
@@ -1872,14 +1862,79 @@ video {
   color: rgba(255, 255, 255, var(--tw-text-opacity));
 }
 
+@media (min-width: 768px) {
+  .md\:col-span-8 {
+    grid-column: span 8 / span 8;
+  }
+
+  .md\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
+  .md\:block {
+    display: block;
+  }
+
+  .md\:flex {
+    display: flex;
+  }
+
+  .md\:grid-cols-\[45\%\2c 25\%\2c 15\%\2c 15\%\] {
+    grid-template-columns: 45% 25% 15% 15%;
+  }
+
+  .md\:pl-7 {
+    padding-left: 1.75rem;
+  }
+
+  .md\:pr-5 {
+    padding-right: 1.25rem;
+  }
+
+  .md\:pr-0 {
+    padding-right: 0px;
+  }
+
+  .md\:pl-5 {
+    padding-left: 1.25rem;
+  }
+
+  .md\:pl-10 {
+    padding-left: 2.5rem;
+  }
+}
+
 @media (min-width: 1024px) {
   .lg\:block {
     display: block;
   }
 
-  .lg\:px-5 {
-    padding-left: 1.25rem;
+  .lg\:flex {
+    display: flex;
+  }
+
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-\[20\%\2c 20\%\2c 20\%\2c 1fr\] {
+    grid-template-columns: 20% 20% 20% 1fr;
+  }
+
+  .lg\:pr-5 {
     padding-right: 1.25rem;
+  }
+
+  .lg\:pl-4 {
+    padding-left: 1rem;
+  }
+
+  .lg\:pl-10 {
+    padding-left: 2.5rem;
+  }
+
+  .lg\:pl-14 {
+    padding-left: 3.5rem;
   }
 }
 
@@ -1888,20 +1943,13 @@ video {
     display: block;
   }
 
+  .xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .xl\:space-x-5 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
     margin-right: calc(1.25rem * var(--tw-space-x-reverse));
     margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .xl\:space-x-8 > :not([hidden]) ~ :not([hidden]) {
-    --tw-space-x-reverse: 0;
-    margin-right: calc(2rem * var(--tw-space-x-reverse));
-    margin-left: calc(2rem * calc(1 - var(--tw-space-x-reverse)));
-  }
-
-  .xl\:px-5 {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
   }
 }

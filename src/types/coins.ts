@@ -34,7 +34,7 @@ export enum CoinsNameLower {
 	cEUR = 'cEur'
 }
 
-export const Coins = {
+export const Coins : Coins = {
 	celo: {
 		name: 'Celo',
 		coinUrl: CoinsURL.CELO,

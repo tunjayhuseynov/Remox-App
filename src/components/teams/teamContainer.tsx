@@ -24,6 +24,7 @@ const TeamContainer = (props : TeamInfoWithMembers) => {
             throw error
         }
     }
+    console.log(props.teamMembers)
 
     return <>
         <div className="col-span-4 flex space-x-3 py-4 pt-14 pb-1 px-5 items-center">
@@ -38,7 +39,7 @@ const TeamContainer = (props : TeamInfoWithMembers) => {
             </div>
         </div>
         {props.teamMembers.slice(0, num).map(w =>
-            <div key={generate()} className="grid grid-cols-[20%,20%,20%,1fr] py-6 border-b border-black pb-5 px-5 text-sm">
+            <div key={generate()} className="grid grid-cols-[30%,30%,1fr] lg:grid-cols-[20%,20%,20%,1fr] py-6 border-b border-black pb-5 px-5 text-sm">
                 <TeamItem teamName={props.title} {...w}/>
             </div>
         )}

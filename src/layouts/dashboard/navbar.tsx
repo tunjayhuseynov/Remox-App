@@ -11,7 +11,7 @@ const Navbar = () => {
     const storage = useAppSelector(selectStorage)
 
     return <div className="grid grid-cols-5 gap-12">
-        <div className="h-[50px] flex items-center pl-14">
+        <div className="h-[50px] flex items-center pl-4 lg:pl-14">
             <img src="/logo.png" alt="" width="150" />
         </div>
         <div className="search col-span-2">

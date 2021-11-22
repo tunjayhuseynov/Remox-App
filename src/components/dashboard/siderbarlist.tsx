@@ -6,7 +6,7 @@ const Sidebarlist = () => {
     return <>
         <ul>
             <Link to="/dashboard"><Li><DashboardSVG />Dashboard</Li></Link>
-            <Li><PayrollSVG />Run Payroll</Li>
+            <Li><PayrollSVG />Payroll</Li>
             <Link to="/dashboard/transactions"><Li><TransactionsSVG />Transactions</Li></Link>
             <Li><SwapSVG />Swap</Li>
             <Li><AssetsSVG />Assets</Li>

@@ -70,9 +70,9 @@ const Teams = () => {
             </button>
         </div>
         <div className="w-full shadow-custom px-5 pt-4 pb-6 rounded-xl">
-            <div id="header" className="grid grid-cols-[20%,20%,20%,1fr] border-b border-black pb-5 px-5" >
+            <div id="header" className="grid grid-cols-[30%,30%,1fr] lg:grid-cols-[20%,20%,20%,1fr] border-b border-black pb-5 px-5" >
                 <div className="font-normal">Name</div>
-                <div className="font-normal">Team</div>
+                <div className="font-normal hidden lg:block">Team</div>
                 <div className="font-normal">Amount</div>
                 <div className="font-normal">Wallet Address</div>
             </div>

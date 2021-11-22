@@ -5,7 +5,7 @@ import Login from "../../components/import/login";
 import { useAccountExistMutation } from "../../redux/api";
 
 const Import = () => {
-    const [accountExist, { error, isLoading }] = useAccountExistMutation()
+    const [accountExist, { error: reqError, isLoading }] = useAccountExistMutation()
     const [input, setInput] = useState<string>()
     const [index, setIndex] = useState(0)
 
@@ -15,8 +15,9 @@ const Import = () => {
                 const data = await accountExist({ phrase: input.trim() }).unwrap()
                 if (!data!.result) setIndex(1)
                 else setIndex(2)
-            } catch (error) {
-                console.error(error)
+            } catch (error: any) {
+                console.error(Object.values(error))
+                
             }
         }
     }

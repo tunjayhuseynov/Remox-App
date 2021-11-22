@@ -9,6 +9,7 @@ import { useDeleteMemberMutation } from "../../redux/api/teamMember";
 import { Member } from "../../types/sdk";
 
 const TeamItem = (props: Member & { teamName: string }) => {
+    console.log(props.currency)
     const [deleteMember] = useDeleteMemberMutation()
     const [modalVisible, setModalVisible] = useState(false)
     const [modalEditVisible, setModalEditVisible] = useState(false)
@@ -31,7 +32,7 @@ const TeamItem = (props: Member & { teamName: string }) => {
                 </div>
             </div>
         </div>
-        <div className="pl-[2px] flex items-center">
+        <div className="pl-[2px] hidden lg:flex items-center">
             {props.teamName}
         </div>
         <div className="pl-[2px] flex items-center justify-start gap-2">
@@ -43,7 +44,7 @@ const TeamItem = (props: Member & { teamName: string }) => {
                 {Coins[props.currency].name}
             </div>
         </div>
-        <div className="pl-[2px] flex items-center">
+        <div className="pl-[2px] self-center truncate">
             {props.address}
         </div>
         {modalVisible && <Modal onDisable={setModalVisible}>
