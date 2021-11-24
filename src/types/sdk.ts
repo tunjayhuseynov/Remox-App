@@ -9,6 +9,7 @@ export * from './sdk/Transaction/GetBalance'
 export * from './sdk/Transaction/SendCUSD'
 export * from './sdk/Transaction/SendCelo'
 export * from './sdk/Transaction/SendMultipleTransaction'
+export * from './sdk/Transaction/SendAltcoin'
 
 export * from './sdk/Customer/CustomerCreate'
 export * from './sdk/Customer/GetCustomer'

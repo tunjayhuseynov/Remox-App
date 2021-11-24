@@ -8,11 +8,11 @@ import Error from "../../components/error";
 import { DropDownItem } from "../../types/dropdown";
 import { MultipleTransactionData } from "../../types/sdk";
 import CSV from '../../utility/CSV'
-import { useGetBalanceQuery, useSendCeloMutation, useSendStableTokenMutation, useSendMultipleTransactionsMutation } from "../../redux/api";
+import { useGetBalanceQuery, useSendCeloMutation, useSendStableTokenMutation, useSendMultipleTransactionsMutation, useSendAltTokenMutation } from "../../redux/api";
 import { useSelector } from "react-redux";
 import { selectStorage } from "../../redux/reducers/storage";
 import Input from "../../components/pay/payinput";
-import { StableTokens } from "../../types/coins";
+import { AltCoins, AltcoinsList, Coins, CoinsNameVisual, StableTokens } from "../../types/coins";
 
 
 const Pay = () => {
@@ -24,6 +24,7 @@ const Pay = () => {
     const [sendCelo] = useSendCeloMutation()
     const [sendStableToken] = useSendStableTokenMutation()
     const [sendMultiple] = useSendMultipleTransactionsMutation()
+    const [sendAltcoin] = useSendAltTokenMutation()
 
 
     const [index, setIndex] = useState(1)
@@ -41,6 +42,7 @@ const Pay = () => {
     const fileInput = useRef<HTMLInputElement>(null);
 
     const [selectedWallet, setSelectedWallet] = useState<DropDownItem>();
+    const [list, setList] = useState<Array<DropDownItem>>([]);
 
     useEffect(() => {
         if (csvImport.length > 0) {
@@ -58,7 +60,14 @@ const Pay = () => {
 
     useEffect(() => {
         if (data) {
-            setSelectedWallet({ name: "Celo", type: "celo", amount: data.celoBalance })
+            const coins = Object.values(Coins).map((coin: AltCoins) => ({
+                name: `${parseFloat(data[coin.responseName]).toFixed(3)} ${coin.name}`,
+                type: coin.value,
+                amount: data[coin.responseName],
+                coinUrl: coin.coinUrl,
+            }))
+            setSelectedWallet(coins[0])
+            setList(coins)
         }
     }, [data])
 
@@ -78,25 +87,30 @@ const Pay = () => {
                 })
             }
         }
-
         setIsPaying(true)
 
         try {
             if (result.length === 1 && selectedWallet && selectedWallet.name) {
-                if (selectedWallet!.name.toLowerCase() === "celo") {
+                if (selectedWallet!.name === CoinsNameVisual.CELO) {
                     await sendCelo({
                         toAddress: result[0].toAddress,
                         amount: result[0].amount,
                         phrase: storage!.encryptedPhrase
-                    }).unwrap
+                    }).unwrap()
 
-                } else if (selectedWallet.name.toLowerCase() === "cusd") {
-
+                } else if (selectedWallet!.name === CoinsNameVisual.cUSD || selectedWallet!.name === CoinsNameVisual.cEUR) {
                     await sendStableToken({
                         toAddress: result[0].toAddress,
                         amount: result[0].amount,
                         phrase: storage!.encryptedPhrase,
                         stableTokenType: StableTokens[(result[0].tokenType as StableTokens)]
+                    }).unwrap()
+                } else {
+                    await sendAltcoin({
+                        toAddress: result[0].toAddress,
+                        amount: result[0].amount,
+                        phrase: storage!.encryptedPhrase,
+                        altTokenType: AltcoinsList[(result[0].tokenType as AltcoinsList)]
                     }).unwrap()
                 }
             }
@@ -134,7 +148,7 @@ const Pay = () => {
                             <div className="flex flex-col">
                                 <span className="text-left">Paying From</span>
                                 <div className="grid grid-cols-4">
-                                    {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={[{ name: "Celo", type: 'celo', amount: `${data.celoBalance}` }, { name: "cUSD", type: 'cUsd', amount: `${data.cUSDBalance}` }, { name: "cEUR", type: 'cEur', amount: `${data.cEURBalance}` }]} />}
+                                    {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={list} disableAddressDisplay={true}/>}
                                 </div>
                             </div>
                             <div className="flex flex-col">

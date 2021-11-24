@@ -4,7 +4,7 @@ const CoinItem = ({ title, coin, usd, percent, rate, img }: { title: string, coi
 
     return <div className="py-2 pl-1 gap-2 pr-5 flex bg-greylish bg-opacity-5 rounded-xl h-[60px]">
         <div className="w-[20px] flex items-center justify-center">
-            <img src={img} alt="" />
+            <img width="20" height="20" src={img} alt="" />
         </div>
         <div className="flex-grow grid grid-cols-3 gap">
             <div className="flex flex-col justify-between items-start">

@@ -11,6 +11,8 @@ import { selectStorage } from "../../redux/reducers/storage";
 import { Coins, TransactionFeeTokenName } from "../../types/coins";
 import { TransactionDirection, TransactionStatus, TransactionType } from "../../types/dashboard/transaction";
 import { CSVLink } from "react-csv";
+import lodash from "lodash";
+import { Transactions as transactionType } from "../../types/sdk";
 
 
 const Transactions = () => {
@@ -19,23 +21,24 @@ const Transactions = () => {
 
     const [take, setTake] = useState(4)
     const [trigger, { data: transactions, error: transactionError, isLoading }] = useLazyGetTransactionsQuery()
+    const [list, setList] = useState<lodash.Dictionary<[transactionType, ...transactionType[]]>>()
 
     useEffect(() => {
-        trigger({ address: storage!.accountAddress, take: 100 })
+        trigger(storage!.accountAddress)
         const interval = setInterval(() => {
-            trigger({ address: storage!.accountAddress, take: 100 })
+            trigger(storage!.accountAddress)
         }, 15000)
         return () => clearInterval(interval)
     }, [])
 
     useEffect(() => {
-        if (transactions) {
-            transactions.reduce((acc, cur) => {
-
-                return acc;
-            }, [])
+        if (transactions?.result) {
+            const res = lodash.groupBy(transactions.result, lodash.iteratee('blockNumber'))
+            console.log(res)
+            setList(res)
         }
-    }, [transactions])
+
+    }, [transactions?.result])
 
     return <>
         <div>
@@ -45,11 +48,11 @@ const Transactions = () => {
                     <div className="font-semibold">Total Amount</div>
                     <div className="font-semibold hidden md:block">Status</div>
                     <div className="place-self-end ">
-                        {transactions && <CSVLink className="font-normal px-5 py-1 rounded-md cursor-pointer bg-greylish bg-opacity-20 flex items-center justify-center xl:space-x-5" filename={"remox_transactions.csv"} data={transactions.map(w => ({
-                            'Sent From:': w.node.celoTransfer.edges[0].node.fromAddressHash,
-                            'Amount:': parseFloat(Web3.utils.fromWei(w.node.celoTransfer.edges[0].node.value, 'ether')).toFixed(4) + ` ${Coins[Object.entries(TransactionFeeTokenName).find(s => s[0] === w.node.feeToken)![1]].name}`,
-                            'To:': w.node.celoTransfer.edges[0].node.toAddressHash,
-                            'Date': dateFormat(new Date(w.node.timestamp), "mediumDate")
+                        {transactions && <CSVLink className="font-normal px-5 py-1 rounded-md cursor-pointer bg-greylish bg-opacity-20 flex items-center justify-center xl:space-x-5" filename={"remox_transactions.csv"} data={transactions.result.map(w => ({
+                            'Sent From:': w.from,
+                            'Amount:': parseFloat(Web3.utils.fromWei(w.value, 'ether')).toFixed(4) + ` ${Coins[Object.entries(TransactionFeeTokenName).find(s => s[0] === w.tokenSymbol)![1]].name}`,
+                            'To:': w.to,
+                            'Date': dateFormat(new Date(parseInt(w.timeStamp) * 1e3), "mediumDate")
                         }))}>
                             <div className={'hidden xl:block'}>Export</div>
                             <img src="/icons/downloadicon.svg" alt="" />
@@ -58,23 +61,40 @@ const Transactions = () => {
 
                 </div>
                 <div>
-                    {!isLoading && transactions ? transactions.slice(0, take).map((transaction, index) => {
-                        const tx = transaction.node;
-                        console.log(tx)
+                    {!isLoading && list ? Object.values(list).reverse().slice(0, take).map((transaction) => {
+                        let amount, coin, coinName, direction, date, amountUSD, surplus, type, hash;
+                        if (transaction.length === 1) {
+                            const tx = transaction[0];
+                            hash = tx.blockNumber
+                            amount = parseFloat(Web3.utils.fromWei(tx.value, 'ether')).toFixed(2)
+                            coin = Coins[Object.entries(TransactionFeeTokenName).find(w => w[0] === tx.tokenSymbol)![1]];
+                            coinName = coin.name;
+                            direction = tx.from.trim().toLowerCase() === storage!.accountAddress.trim().toLowerCase() ? TransactionDirection.Out : TransactionDirection.In
+                            date = dateFormat(new Date(parseInt(tx.timeStamp) * 1e3), "mediumDate")
+                            amountUSD = (currencies[coin.name] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.value, 'ether')).toFixed(4))
+                            surplus = direction === TransactionDirection.In ? '+' : '-'
+                            type = direction === TransactionDirection.In ? TransactionType.IncomingPayment : TransactionType.QuickTransfer
+                        } else {
+                            const tx = transaction;
+                            hash = tx[0].blockNumber
+                            amount = parseFloat(Web3.utils.fromWei(tx.reduce((a,c)=> a + parseFloat(c.value) ,0).toString(), 'ether')).toFixed(2)
+                            //coin = Coins[Object.entries(TransactionFeeTokenName).find(w => w[0] === tx.tokenSymbol)![1]];
+                            //coinName = coin.name;
+                            direction = TransactionDirection.Out
+                            date = dateFormat(new Date(parseInt(tx[0].timeStamp) * 1e3), "mm/dd/yyyy hh:MM:ss")
+                            amountUSD = tx.reduce((a,c)=>{
+                                const coin = Coins[Object.entries(TransactionFeeTokenName).find(w => w[0] === c.tokenSymbol)![1]]
+                                a += (currencies[coin.name] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(c.value, 'ether')).toFixed(4))
+                                return a;
+                            }, 0)
+                            surplus = '-'
+                            type = TransactionType.MassPayout
+                        }
+                        return <TransactionItem key={generate()} hash={hash} amountCoin={`${amount} ${coinName}`} type={type} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(3)}$`} status={TransactionStatus.Complated} />
 
-                        const amount = parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2)
-                        const coin = Coins[Object.entries(TransactionFeeTokenName).find(w => w[0] === tx.feeToken)![1]];
-                        const coinName = coin.name;
-                        const direction = tx.celoTransfer.edges[0].node.fromAddressHash.trim().toLowerCase() === storage!.accountAddress.trim().toLowerCase() ? TransactionDirection.Out : TransactionDirection.In
-                        const date = dateFormat(new Date(tx.timestamp), "mediumDate")
-                        const amountUSD = (currencies[coin.lowerName] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.celoTransfer.edges[0].node.value, 'ether')).toFixed(2))
-                        const surplus = direction === TransactionDirection.In ? '+' : '-'
-                        const type = direction === TransactionDirection.In ? TransactionType.IncomingPayment : TransactionType.QuickTransfer
-
-                        return <TransactionItem key={generate()} hash={tx.celoTransfer.edges[0].node.transactionHash.toString()} amountCoin={`${amount} ${coinName}`} type={type} direction={direction} date={date} amountUSD={`${surplus}${amountUSD.toFixed(2)}$`} status={TransactionStatus.Complated} expand={true} />
                     }) : <div className="text-center"><ClipLoader /></div>}
                 </div>
-                {transactions && take < 100 && take < transactions.length && <div className="flex justify-center py-4">
+                {list && take < 100 && take < Object.values(list).length && <div className="flex justify-center py-4">
                     <button className="text-primary px-5 py-3 rounded-xl border border-primary" onClick={() => {
                         if (100 - take < 4) {
                             setTake(100 - (100 - take))

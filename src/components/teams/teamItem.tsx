@@ -9,7 +9,6 @@ import { useDeleteMemberMutation } from "../../redux/api/teamMember";
 import { Member } from "../../types/sdk";
 
 const TeamItem = (props: Member & { teamName: string }) => {
-    console.log(props.currency)
     const [deleteMember] = useDeleteMemberMutation()
     const [modalVisible, setModalVisible] = useState(false)
     const [modalEditVisible, setModalEditVisible] = useState(false)

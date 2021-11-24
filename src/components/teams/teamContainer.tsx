@@ -24,7 +24,6 @@ const TeamContainer = (props : TeamInfoWithMembers) => {
             throw error
         }
     }
-    console.log(props.teamMembers)
 
     return <>
         <div className="col-span-4 flex space-x-3 py-4 pt-14 pb-1 px-5 items-center">

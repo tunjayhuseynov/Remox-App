@@ -1,35 +1,29 @@
 import { TransactionFeeTokenName } from "../coins";
 
-export interface BlockScoutNode {
-    node: BlockScoutBlock
+export interface GetTransactions{
+    message: string,
+    result: Transactions[]
 }
 
-export interface BlockScoutBlock {
-    blockNumber: number;
-    celoTransfer: TransferEdge
-    feeToken: TransactionFeeTokenName,
+export interface Transactions{
+    value: string,
+    blockHash: string,
+    blockNumber: string,
+    confirmations: string,
+    contractAddress: string,
+    cumulativeGasUsed: string,
+    from: string,
+    gas: string,
     gasPrice: string,
     gasUsed: string,
-    gatewayFee: string,
-    gatewayFeeRecipient: string,
-    timestamp: string,
-    transactionHash: string
-}
-
-export interface TransferEdge {
-    edges: TransferNode[]
-}
-
-export interface TransferNode {
-    node: TransferBlock
-}
-
-export interface TransferBlock {
-    blockNumber: number,
-    fromAddressHash: string,
-    gasPrice: string,
-    gasUsed: string,
-    toAddressHash: string,
-    transactionHash: string,
-    value: string
+    hash: string,
+    input: string,
+    logIndex: string,
+    nonce: string,
+    timeStamp: string,
+    to: string,
+    tokenDecimal: string,
+    tokenName: string,
+    tokenSymbol: TransactionFeeTokenName,
+    transactionIndex: string
 }

@@ -21,7 +21,7 @@ const Delete = ({ name, onCurrentModal, onDelete, onSuccess }: { name: string, o
                     dispatch(changeSuccess(true))
                     onCurrentModal(false)
                 } catch (error) {
-                    console.log(error)
+                    console.error(error)
                 }
                 setLoading(false)
             }}>{loading ? <ClipLoader size={20} /> : 'Delete'}</button>

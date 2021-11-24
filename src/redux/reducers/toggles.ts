@@ -8,10 +8,14 @@ const initialState = {
 export const toggleSlice = createSlice({
 	name: 'storage',
 	initialState: initialState,
-	reducers: {}
+	reducers: {
+		setMenu: (state, action) =>{
+			state.mobileMenu = action.payload;
+		}
+	}
 });
 
-export const {} = toggleSlice.actions;
+export const {setMenu} = toggleSlice.actions;
 
 export const selectToggle = (state: RootState) => state.toggle;
 

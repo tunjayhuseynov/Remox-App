@@ -7,11 +7,10 @@ import Success from "../../components/success";
 import Error from "../../components/error";
 import { DropDownItem } from "../../types/dropdown";
 import { Member, MultipleTransactionData } from "../../types/sdk";
-import { useGetBalanceQuery, useLazyGetTeamsWithMembersQuery, useSendCeloMutation, useSendStableTokenMutation, useSendMultipleTransactionsMutation } from "../../redux/api";
-import { useSelector } from "react-redux";
+import { useGetBalanceQuery, useLazyGetTeamsWithMembersQuery, useSendCeloMutation, useSendStableTokenMutation, useSendMultipleTransactionsMutation, useSendAltTokenMutation } from "../../redux/api";
 import { selectStorage } from "../../redux/reducers/storage";
 import TeamInput from "../../components/pay/teaminput";
-import { CoinsName, CoinsURL, StableTokens } from "../../types/coins";
+import { AltCoins, AltcoinsList, Coins, CoinsName, CoinsURL, StableTokens } from "../../types/coins";
 import { useAppSelector } from "../../redux/hooks";
 
 
@@ -24,6 +23,9 @@ const MassPay = () => {
     const [sendCelo] = useSendCeloMutation()
     const [sendStableToken] = useSendStableTokenMutation()
     const [sendMultiple] = useSendMultipleTransactionsMutation()
+    const [sendAltcoin] = useSendAltTokenMutation()
+
+
     const [getTeams, { data: teams, error: teamsError, isLoading: teamLoading }] = useLazyGetTeamsWithMembersQuery()
 
 
@@ -39,17 +41,25 @@ const MassPay = () => {
     const [members, setMembers] = useState<Member[]>();
     const [selectedId, setSelectedId] = useState<string[]>([]);
 
+    const [list, setList] = useState<Array<DropDownItem>>([]);
+
+
     useEffect(() => {
         getTeams({ take: Number.MAX_SAFE_INTEGER })
     }, [])
 
-    useEffect(() => {
-        console.log(resMember.current)
-    }, [selectedId])
 
     useEffect(() => {
         if (data) {
             setSelectedWallet({ name: "Set all to", address: "" })
+            const coins = Object.values(Coins).map((coin: AltCoins) => ({
+                name: `${parseFloat(data[coin.responseName]).toFixed(3)} ${coin.name}`,
+                type: coin.value,
+                value: coin.value,
+                coinUrl: coin.coinUrl,
+                amount: data[coin.responseName]
+            }))
+            setList(coins)
         }
     }, [data])
 
@@ -94,12 +104,19 @@ const MassPay = () => {
                         phrase: storage!.encryptedPhrase
                     }).unwrap
 
-                } else {
+                } else if (result[0].tokenType === CoinsName.cUSD || result[0].tokenType === CoinsName.cEUR) {
                     await sendStableToken({
                         toAddress: result[0].toAddress,
                         amount: result[0].amount,
                         phrase: storage!.encryptedPhrase,
-                        stableTokenType: StableTokens[(result[0].tokenType as StableTokens)]
+                        stableTokenType: StableTokens[(result[0].tokenType)]
+                    }).unwrap()
+                } else {
+                    await sendAltcoin({
+                        toAddress: result[0].toAddress,
+                        amount: result[0].amount,
+                        phrase: storage!.encryptedPhrase,
+                        altTokenType: AltcoinsList[(result[0].tokenType as AltcoinsList)]
                     }).unwrap()
                 }
             }
@@ -138,7 +155,7 @@ const MassPay = () => {
                                 <span className="text-left font-semibold">Paying From</span>
                                 <div className="grid grid-cols-4 gap-x-10">
                                     {!(teams && selectedTeam) ? <ClipLoader /> : <Dropdown className="h-full" disableAddressDisplay={true} onSelect={setSelectedTeam} nameActivation={true} selected={selectedTeam} list={teams.teams.map(w => ({ name: w.title, address: w.id }))} />}
-                                    {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={[{ name: "Celo", type: 'celo', amount: `${data.celoBalance}`, value: CoinsName.CELO, coinUrl: CoinsURL.CELO }, { name: "cUSD", type: 'cUsd', amount: `${data.cUSDBalance}`, value: CoinsName.cUSD, coinUrl: CoinsURL.cUSD }]} />}
+                                    {!(data && selectedWallet) ? <ClipLoader /> : <Dropdown onSelect={setSelectedWallet} nameActivation={true} selected={selectedWallet} list={list} disableAddressDisplay={true} />}
                                 </div>
                             </div>
                             <div className="flex flex-col">
@@ -161,6 +178,14 @@ const MassPay = () => {
                                     <div></div>
                                     {teams && resMember && selectedTeam && selectedTeam.address && members && members.length > 0 ? resMember.current.map((w, i) => <TeamInput generalWallet={selectedWallet!} setGeneralWallet={setSelectedWallet} selectedId={selectedId} setSelectedId={setSelectedId} key={generate()} index={i} {...w} members={resMember} />) : 'No Member Yet'}
                                 </div>
+                            </div>
+                            <div className="grid grid-cols-4">
+                                <div className="font-semibold text-sm">Current Balance</div>
+                                <div className="font-semibold text-sm">Current Amount To Send</div>
+                                <div className="font-semibold text-sm">Selected People</div>
+                                <div className="font-semibold text-sm">Balance After Transaction</div>
+                                {selectedId.length === 0 && <div className="col-span-4 text-center pt-5">No Selected Member Yet</div>}
+                                {selectedId}
                             </div>
                             <div className="flex flex-col">
                                 <span className="text-left">Description (Optional)</span>
