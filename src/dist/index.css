@@ -706,6 +706,10 @@ video {
   margin-right: 0.5rem;
 }
 
+.block {
+  display: block;
+}
+
 .inline-block {
   display: inline-block;
 }
@@ -790,6 +794,10 @@ video {
   height: 27px;
 }
 
+.h-\[full\] {
+  height: full;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -804,6 +812,10 @@ video {
 
 .min-h-\[75vh\] {
   min-height: 75vh;
+}
+
+.min-h-\[75px\] {
+  min-height: 75px;
 }
 
 .w-full {

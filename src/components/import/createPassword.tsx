@@ -31,10 +31,10 @@ const CreatePassword = ({ phrase }: { phrase: string }) => {
                 token: data!.token,
             };
 
-            dispatch(setStorage(JSON.stringify(obj)))
             dispatch(setUnlock(true))
+            dispatch(setStorage(JSON.stringify(obj)))
 
-            router.push('/dashboard')
+            // router.push('/dashboard')
         } catch (error) {
             console.error(error)
         }

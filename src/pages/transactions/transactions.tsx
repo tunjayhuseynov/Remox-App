@@ -71,7 +71,7 @@ const Transactions = () => {
                             coinName = coin.name;
                             direction = tx.from.trim().toLowerCase() === storage!.accountAddress.trim().toLowerCase() ? TransactionDirection.Out : TransactionDirection.In
                             date = dateFormat(new Date(parseInt(tx.timeStamp) * 1e3), "mediumDate")
-                            amountUSD = (currencies[coin.name] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.value, 'ether')).toFixed(4))
+                            amountUSD = (currencies[coin.name]?.price ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.value, 'ether')).toFixed(4))
                             surplus = direction === TransactionDirection.In ? '+' : '-'
                             type = direction === TransactionDirection.In ? TransactionType.IncomingPayment : TransactionType.QuickTransfer
                         } else {
@@ -84,7 +84,7 @@ const Transactions = () => {
                             date = dateFormat(new Date(parseInt(tx[0].timeStamp) * 1e3), "mm/dd/yyyy hh:MM:ss")
                             amountUSD = tx.reduce((a,c)=>{
                                 const coin = Coins[Object.entries(TransactionFeeTokenName).find(w => w[0] === c.tokenSymbol)![1]]
-                                a += (currencies[coin.name] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(c.value, 'ether')).toFixed(4))
+                                a += (currencies[coin.name]?.price ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(c.value, 'ether')).toFixed(4))
                                 return a;
                             }, 0)
                             surplus = '-'

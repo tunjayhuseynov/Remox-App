@@ -21,14 +21,16 @@ import { selectUnlock } from './redux/reducers/unlock';
 import { useAppSelector } from './redux/hooks';
 import Details from './pages/transactions/details';
 import MassPay from './pages/dashboard/masspay'
-import { AnimatePresence } from 'framer-motion';
+import Initalization from './utility/init'
 
 function App(): JSX.Element {
   const storage = useAppSelector(selectStorage)
   const unlock = useAppSelector(selectUnlock)
 
+
   return (
     <div className="App min-h-screen w-full">
+      <Initalization/>
       <Switch>
         <Route path="/unlock" exact >
           <Unlock />

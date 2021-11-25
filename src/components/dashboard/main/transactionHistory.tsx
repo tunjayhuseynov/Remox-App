@@ -27,7 +27,7 @@ const TransactionHistory = ({ transactions }: { transactions: Transactions[] }) 
                 const coinName = coin.name;
                 const direction = tx.from.trim().toLowerCase() === storage!.accountAddress.trim().toLowerCase() ? TransactionDirection.Out : TransactionDirection.In
                 const date = dateFormat(new Date(parseInt(tx.timeStamp) * 1e3), "mediumDate")
-                const amountUSD = (currencies[coin.name] ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.value, 'ether')).toFixed(4))
+                const amountUSD = (currencies[coin.name]?.price ?? 0) * parseFloat(parseFloat(Web3.utils.fromWei(tx.value, 'ether')).toFixed(4))
                 const surplus = direction === TransactionDirection.In ? '+' : '-'
                 const type = direction === TransactionDirection.In ? TransactionType.IncomingPayment : TransactionType.QuickTransfer
 

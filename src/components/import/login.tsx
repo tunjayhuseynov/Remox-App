@@ -33,8 +33,8 @@ const Login = ({ phrase }: { phrase: string }) => {
                     token: data!.token,
                 };
 
-                dispatch(setStorage(JSON.stringify(obj)))
                 dispatch(setUnlock(true))
+                dispatch(setStorage(JSON.stringify(obj)))
 
             } catch (error) {
                 console.error(error);

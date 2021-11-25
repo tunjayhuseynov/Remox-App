@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BaseUrl } from '../../utility/const'
-import { GetBalanceResponse, SendCelo, SendCeloResponse, SendStableToken, SendStableTokenResponse, SendMultipleTransaction, SendAltcoin, SendAltcoinResponse } from '../../types/sdk'
+import { GetBalanceResponse, SendCelo, SendCeloResponse, SendStableToken, SendStableTokenResponse, SendMultipleTransaction, SendAltcoin, SendAltcoinResponse, GetCurrencies } from '../../types/sdk'
 import { RootState } from '../store';
 
 export const transactionAPI = createApi({
@@ -21,7 +21,11 @@ export const transactionAPI = createApi({
                 url: '/transaction/balance',
             })
         }),
-
+        getCurrencies: builder.query<GetCurrencies, void>({
+            query: () => ({
+                url: '/transaction/currency',
+            })
+        }),
         sendCelo: builder.mutation<SendCeloResponse, SendCelo>({
             query: (data) => ({
                 url: '/transaction/sendCelo',
@@ -55,4 +59,4 @@ export const transactionAPI = createApi({
 })
 
 
-export const { useGetBalanceQuery, useSendCeloMutation, useSendStableTokenMutation, useSendAltTokenMutation, useSendMultipleTransactionsMutation } = transactionAPI
+export const { useGetBalanceQuery, useGetCurrenciesQuery,  useSendCeloMutation, useSendStableTokenMutation, useSendAltTokenMutation, useSendMultipleTransactionsMutation } = transactionAPI

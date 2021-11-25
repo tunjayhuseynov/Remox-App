@@ -12,6 +12,7 @@ import { generate } from 'shortid';
 
 interface Balance {
     amount: number,
+    per_24?: number,
     percent: number,
     coins: AltCoins,
     reduxValue: number | undefined
@@ -24,6 +25,7 @@ const Main = () => {
 
     const { data: transactions, error: transactionError, } = useGetTransactionsQuery(storage!.accountAddress)
 
+    const currencies = useAppSelector(SelectCurrencies)
     const celo = (useAppSelector(SelectCurrencies)).CELO
     const cusd = (useAppSelector(SelectCurrencies)).cUSD
     const ceur = (useAppSelector(SelectCurrencies)).cEUR
@@ -74,61 +76,10 @@ const Main = () => {
         }
     }, [celoBalance, cusdBalance, ceurBalance, ubeBalance, mooBalance, mobiBalance, poofBalance, coin, celo, cusd, ceur, ube, moo, mobi, poof])
 
-    const getCurrency = (id: string, { signal }: { signal?: AbortSignal } = {}): Promise<CoinMarketChartResponse> => {
-        const CoinGecko = new CoinGeckoClient();
 
-        return new Promise(async (resolve, reject) => {
-            CoinGecko.coinIdMarketChart({ id: id, vs_currency: 'usd', days: 1 }).then(w => resolve(w)).catch(e => reject(e))
-
-            signal?.addEventListener("abort", () => {
-                reject("Aborted")
-            })
-        })
-    }
-
-
-    useEffect(() => {
-        const controller = new AbortController()
-        Promise.all(
-            [
-                getCurrency("celo", { signal: controller.signal }),
-                getCurrency("celo-dollar", { signal: controller.signal }),
-                getCurrency("celo-euro", { signal: controller.signal }),
-                getCurrency("ubeswap", { signal: controller.signal }),
-                getCurrency("moola-market", { signal: controller.signal }),
-                getCurrency("mobius", { signal: controller.signal }),
-                getCurrency("poofcash", { signal: controller.signal }),
-            ]).then(w => {
-
-                const [celoData, cusdData, ceurData, ubeData, mooData, mobiData, poofData] = w;
-
-                dispatch(updateAllCurrencies([
-                    celoData.prices[celoData.prices.length - 1][1],
-                    cusdData.prices[cusdData.prices.length - 1][1],
-                    ceurData.prices[ceurData.prices.length - 1][1],
-                    ubeData.prices[ubeData.prices.length - 1][1],
-                    mooData.prices[mooData.prices.length - 1][1],
-                    mobiData.prices[mobiData.prices.length - 1][1],
-                    poofData.prices[poofData.prices.length - 1][1],
-                ]))
-
-            }).catch(e => console.error(e))
-
-        return () => {
-            controller.abort();
-        }
-
-    }, [])
 
     useEffect(() => {
         if (celo && cusd && ceur && ube && moo && mobi && poof && storage && storage.token && data) {
-
-            const total = Object.values(data).reduce((a, b) => a + parseFloat(b), 0)
-            setCoin(total)
-            const result: number = (celo * parseFloat(data.celoBalance)) + (cusd * parseFloat(data.cUSDBalance))
-            setBalance(result.toFixed(2))
-            setPercent(0.7)
-
             const pCelo = parseFloat(data.celoBalance);
             const pCusd = parseFloat(data.cUSDBalance);
             const pCeur = parseFloat(data.cEURBalance);
@@ -137,13 +88,27 @@ const Main = () => {
             const pMobi = parseFloat(data.MOBI);
             const pPoof = parseFloat(data.POOF);
 
-            setCeloBalance({ amount: pCelo, percent: (pCelo * 100) / total, coins: Coins.celo, reduxValue: celo })
-            setCusdBalance({ amount: pCusd, percent: (pCusd * 100) / total, coins: Coins.cUSD, reduxValue: cusd })
-            setCeurBalance({ amount: pCeur, percent: (pCeur * 100) / total, coins: Coins.cEUR, reduxValue: ceur })
-            setUbeBalance({ amount: pUbe, percent: (pUbe * 100) / total, coins: Coins.UBE, reduxValue: ube })
-            setMooBalance({ amount: pMoo, percent: (pMoo * 100) / total, coins: Coins.MOO, reduxValue: moo })
-            setMobiBalance({ amount: pMobi, percent: (pMobi * 100) / total, coins: Coins.MOBI, reduxValue: mobi })
-            setPoofBalance({ amount: pPoof, percent: (pPoof * 100) / total, coins: Coins.POOF, reduxValue: poof })
+
+            const total = pCelo + pCusd + pCeur + pUbe + pMoo + pMobi + pPoof;
+            const currencObj = Object.values(currencies)
+            setCoin(total)
+            const result: number = (celo.price! * parseFloat(data.celoBalance)) + (cusd.price! * parseFloat(data.cUSDBalance))
+            setBalance(result.toFixed(2))
+            const per = currencObj.reduce((a,c)=>{
+                a += c.percent_24
+                return a;
+            }, 0)
+            setPercent(per / currencObj.length)
+
+
+
+            setCeloBalance({ amount: pCelo, per_24: currencies.CELO?.percent_24, percent: (pCelo * 100) / total, coins: Coins.celo, reduxValue: celo.price })
+            setCusdBalance({ amount: pCusd, per_24: currencies.cUSD?.percent_24, percent: (pCusd * 100) / total, coins: Coins.cUSD, reduxValue: cusd.price })
+            setCeurBalance({ amount: pCeur, per_24: currencies.cEUR?.percent_24, percent: (pCeur * 100) / total, coins: Coins.cEUR, reduxValue: ceur.price })
+            setUbeBalance({ amount: pUbe, per_24: currencies.UBE?.percent_24, percent: (pUbe * 100) / total, coins: Coins.UBE, reduxValue: ube.price })
+            setMooBalance({ amount: pMoo, per_24: currencies.MOO?.percent_24, percent: (pMoo * 100) / total, coins: Coins.MOO, reduxValue: moo.price })
+            setMobiBalance({ amount: pMobi, per_24: currencies.MOBI?.percent_24, percent: (pMobi * 100) / total, coins: Coins.MOBI, reduxValue: mobi.price })
+            setPoofBalance({ amount: pPoof, per_24: currencies.POOF?.percent_24, percent: (pPoof * 100) / total, coins: Coins.POOF, reduxValue: poof.price })
         }
         if (error) console.error(error)
     }, [celo, cusd, ceur, ube, moo, mobi, poof, storage, data, error])
@@ -169,7 +134,7 @@ const Main = () => {
                     <div className="flex items-center text-3xl text-greylish opacity-70" style={
                         percent && percent > 0 ? { color: 'green' } : { color: 'red' }
                     }>
-                        {percent ? `${percent > 0 ? '+' : '-'} ${percent}%` : <ClipLoader />}
+                        {percent ? `${percent.toFixed(2)}%` : <ClipLoader />}
                     </div>
                 </div>
             </div>
@@ -179,7 +144,7 @@ const Main = () => {
                     <div className="text-base text-greylish">Money in last month</div>
                 </div>
                 <div className="flex justify-between shadow-custom rounded-xl px-8 py-4">
-                    <div className="text-2xl text-greylish opacity-80">
+                    <div className="text-2xl opacity-80">
                         {balance || (balance !== undefined && parseFloat(balance) === 0) ? `+ $8` : <ClipLoader />}
                     </div>
                 </div>
@@ -210,7 +175,7 @@ const Main = () => {
                 allInOne !== undefined ?
                     <div className="flex flex-col gap-5 overflow-hidden">
                         {allInOne.map((item, index) => {
-                            return <CoinItem key={generate()} title={item.coins.name} coin={item.amount.toFixed(2)} usd={((item.reduxValue ?? 0) * item.amount).toFixed(2)} percent={(item.percent).toFixed(1)} rate="+20" img={item.coins.coinUrl} />
+                            return <CoinItem key={generate()} title={item.coins.name} coin={item.amount.toFixed(2)} usd={((item.reduxValue ?? 0) * item.amount).toFixed(2)} percent={(item.percent).toFixed(1)} rate={item.per_24} img={item.coins.coinUrl} />
                         })}
                     </div> : <ClipLoader />
             }
